@@ -1,0 +1,445 @@
+/* ------------------------------------------------------------------
+   applicazioni della scrivania (scacchi, paint, dediche): stesse regole del finder 1984
+   (computer.css): fosfori --mac-bianco / --mac-nero, trama, chicagoflf, bordi da un pixel.
+   ------------------------------------------------------------------ */
+
+/* scrivania: cartelle e applicazioni in colonne da destra; se l’altezza non basta si apre una colonna a sinistra */
+.mac-scrivania .mac-icone-scrivania {
+  bottom: 8px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(auto-fill, 64px);
+  align-items: start;
+  justify-items: center;
+  gap: 4px 6px;
+  direction: rtl;
+}
+.mac-scrivania .mac-icone-scrivania > li {
+  direction: ltr;
+}
+
+/* controlli comuni */
+.app-pulsante {
+  min-height: 28px;
+  padding: 2px 12px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--mac-nero);
+  background: var(--mac-bianco);
+  border: 1px solid var(--mac-nero);
+  border-radius: 8px;
+}
+.app-pulsante-forte {
+  /* pulsante predefinito del 1984: bordo doppio */
+  box-shadow: 0 0 0 2px var(--mac-bianco), 0 0 0 3px var(--mac-nero);
+}
+.app-pulsante:active:not(:disabled) {
+  color: var(--mac-bianco);
+  background: var(--mac-nero);
+}
+.app-pulsante:disabled {
+  color: transparent;
+  background: var(--mac-trama);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+.app-quadro {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: var(--mac-nero);
+  background: var(--mac-bianco);
+  border: 1px solid var(--mac-nero);
+}
+.app-quadro svg {
+  width: 24px;
+  height: 24px;
+}
+.app-quadro[aria-pressed="true"],
+.app-quadro:has(input:checked) {
+  background: var(--mac-nero);
+}
+.app-quadro[aria-pressed="true"] svg,
+.app-quadro:has(input:checked) svg {
+  filter: invert(1);
+}
+.app-opzione {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  font-size: 12px;
+}
+.app-opzione input {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  border: 1px solid var(--mac-nero);
+  border-radius: 50%;
+  background: var(--mac-bianco);
+}
+.app-opzione input:checked {
+  background: radial-gradient(circle, var(--mac-nero) 0 2.5px, var(--mac-bianco) 3px);
+}
+.app-avviso {
+  padding: 14px;
+  font-size: 12px;
+}
+:is(.app-pulsante, .app-quadro, .app-opzione input, .scacchi-casa, .paint-tela, .paint-trama, .dediche-voce, .paint-campo input):focus-visible,
+:is(.app-quadro, .paint-trama):has(input:focus-visible) {
+  outline: 2px dotted var(--mac-nero);
+  outline-offset: 2px;
+}
+.mac-contenuto:has(> :is(.app-scacchi, .app-paint, .app-dediche)) {
+  container-type: inline-size;
+}
+
+/* ---------------------------------------------------------------- scacchi */
+.app-scacchi {
+  display: flex;
+  height: 100%;
+  min-height: 300px;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 10px 10px;
+}
+.scacchi-barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.scacchi-livello {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+.scacchi-livello legend {
+  float: left;
+  margin-right: 4px;
+}
+.scacchi-tavolo {
+  position: relative;
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  place-items: center;
+  container-type: size;
+}
+.scacchi-scacchiera {
+  display: grid;
+  grid-template-rows: repeat(8, 1fr);
+  width: min(100cqw, 100cqh);
+  aspect-ratio: 1;
+  border: 2px solid var(--mac-nero);
+  box-shadow: 0 0 0 1px var(--mac-bianco), 0 0 0 2px var(--mac-nero);
+}
+.scacchi-scacchiera[data-pensa] {
+  cursor: wait;
+}
+.scacchi-riga {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+}
+.scacchi-casa {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  place-items: center;
+  padding: 0;
+  background: var(--mac-bianco);
+  touch-action: manipulation;
+}
+.scacchi-casa[data-scura] {
+  background: var(--mac-trama);
+}
+.scacchi-casa[data-ultima]::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border: 1px dotted var(--mac-nero);
+  outline: 1px dotted var(--mac-bianco);
+  outline-offset: -2px;
+}
+.scacchi-casa[data-scelta] {
+  background: var(--mac-nero);
+}
+.scacchi-casa[data-scelta] .scacchi-pezzo {
+  filter: invert(1);
+}
+.scacchi-casa:focus-visible {
+  z-index: 1;
+  outline-offset: -3px;
+}
+.scacchi-pezzo {
+  position: relative;
+  width: 86%;
+  height: 86%;
+}
+.scacchi-meta {
+  position: absolute;
+  width: 26%;
+  height: 26%;
+  background: var(--mac-nero);
+  box-shadow: 0 0 0 1px var(--mac-bianco);
+}
+.scacchi-presa {
+  position: absolute;
+  inset: 2px;
+  border: 2px solid var(--mac-nero);
+  box-shadow: inset 0 0 0 1px var(--mac-bianco);
+}
+.scacchi-promozione {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  background: var(--mac-bianco);
+  border: 1px solid var(--mac-nero);
+  box-shadow: 2px 2px 0 var(--mac-nero);
+}
+.scacchi-promozione > div {
+  display: flex;
+  gap: 6px;
+}
+.scacchi-stato {
+  min-height: 20px;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------- paint */
+/* tutto in vista senza scorrere: attrezzi in alto, tela che riempie lo spazio, modulo in basso */
+.app-paint {
+  display: flex;
+  height: 100%;
+  min-height: 340px;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 8px 8px;
+}
+.paint-attrezzi {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+.paint-strumenti,
+.paint-spessori,
+.paint-trame {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.paint-attrezzi .app-quadro {
+  width: 30px;
+  height: 30px;
+}
+.paint-attrezzi .app-quadro svg {
+  width: 22px;
+  height: 22px;
+}
+.paint-spessore {
+  display: block;
+  width: 18px;
+  background: var(--mac-nero);
+}
+.app-quadro:has(input:checked) .paint-spessore {
+  background: var(--mac-bianco);
+}
+.paint-trama {
+  display: block;
+  padding: 2px;
+  border: 1px solid var(--mac-nero);
+  background: var(--mac-bianco);
+}
+.paint-trama:has(input:checked) {
+  background: var(--mac-nero);
+}
+.paint-campione {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-size: 8px 8px;
+  image-rendering: pixelated;
+  border: 1px solid var(--mac-nero);
+}
+.paint-comandi {
+  display: flex;
+  gap: 6px;
+}
+.paint-comandi .app-pulsante {
+  padding: 2px 8px;
+  font-size: 11px;
+}
+.paint-spazio {
+  display: grid;
+  flex: 1;
+  min-height: 120px;
+  place-items: center;
+  container-type: size;
+}
+.paint-foglio {
+  position: relative;
+  width: min(100cqw - 4px, (100cqh - 4px) * 512 / 342);
+  border: 1px solid var(--mac-nero);
+  box-shadow: 2px 2px 0 var(--mac-nero);
+}
+.paint-tela {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 512 / 342;
+  image-rendering: pixelated;
+  touch-action: none;
+  outline-offset: 3px;
+}
+.paint-mirino {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  margin: -5px 0 0 -5px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--mac-nero), var(--mac-nero)) 50% 0 / 1px 100% no-repeat,
+    linear-gradient(var(--mac-nero), var(--mac-nero)) 0 50% / 100% 1px no-repeat;
+  box-shadow: 0 0 0 1px var(--mac-bianco);
+}
+.paint-modulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 6px 10px;
+  padding-top: 6px;
+  border-top: 1px solid var(--mac-nero);
+  font-size: 12px;
+}
+.paint-campo {
+  display: flex;
+  flex: 3 1 220px;
+  flex-direction: column;
+  gap: 2px;
+}
+.paint-campo-nome {
+  flex: 1 1 140px;
+}
+.paint-campo input {
+  width: 100%;
+  min-height: 28px;
+  padding: 3px 5px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--mac-nero);
+  background: var(--mac-bianco);
+  border: 1px solid var(--mac-nero);
+  border-radius: 0;
+}
+.paint-campo input::placeholder {
+  color: var(--mac-nero);
+  opacity: 0.5;
+}
+.paint-invio {
+  display: flex;
+  flex: 1 1 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.paint-stato {
+  min-height: 16px;
+}
+
+/* finestra stretta e alta (telefono): scacchiera e tela salgono vicino agli attrezzi */
+@container (max-width: 560px) {
+  .scacchi-tavolo,
+  .paint-spazio {
+    place-items: start center;
+  }
+}
+
+/* ---------------------------------------------------------------- dediche */
+.app-dediche {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 10px 12px;
+  font-size: 12px;
+}
+.dediche-barra,
+.dediche-pagine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.dediche-griglia {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 12px 10px;
+}
+.dediche-voce {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  color: var(--mac-nero);
+  background: var(--mac-bianco);
+  border: 1px solid var(--mac-nero);
+  box-shadow: 1px 1px 0 var(--mac-nero);
+}
+.dediche-voce:active {
+  color: var(--mac-bianco);
+  background: var(--mac-nero);
+}
+.dediche-voce[data-segnalata] {
+  opacity: 0.45;
+}
+.dediche-disegno {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 512 / 342;
+  image-rendering: pixelated;
+  border: 1px solid var(--mac-nero);
+  background: var(--mac-trama);
+}
+.dediche-anteprima {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+}
+.dediche-firma {
+  font-size: 11px;
+}
+.dediche-dettaglio {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/* il disegno aperto lascia spazio a dedica e firma senza scorrere */
+.dediche-dettaglio .dediche-disegno {
+  width: min(100%, 380px);
+  margin: 0 auto;
+}
+.dediche-testo {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.dediche-avviso {
+  min-height: 16px;
+}
+

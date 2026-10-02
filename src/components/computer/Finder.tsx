@@ -1,4 +1,5 @@
-// Scrivania del computer: quattro cartelle (una per disciplina), dentro un documento per progetto.
+// Scrivania del computer: quattro cartelle (una per disciplina), dentro un documento per progetto,
+// e tre applicazioni (scacchi, paint, dediche) scaricate solo quando si aprono (app/Applicazioni.tsx).
 // La finestra del progetto segue l’indirizzo /progetti/:slug: indietro la chiude, un link diretto la apre.
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent, type ReactNode } from 'react'
 import { useLocation, useMatch, useNavigate } from 'react-router'
@@ -10,25 +11,39 @@ import type { Disciplina } from '@/lib/schema'
 import { BarraMenu, TitoloVolto, type Menu } from './BarraMenu'
 import { Blocchi } from './Blocchi'
 import { Finestra, type Rettangolo } from './Finestra'
-import { IconaCartella, IconaDocumento } from './icone'
+import { IconaCartella, IconaDediche, IconaDocumento, IconaPaint, IconaScacchi } from './icone'
+import { ContenutoApp } from './app/Applicazioni'
+import { APPLICAZIONI, type App } from './app/elenco'
+import { clic, disco } from './app/suoni'
 
 // stesso ordine delle discipline nell’header; web design si riaccende in config/discipline.ts
 const CARTELLE: Disciplina[] = disciplineVisibili
 const ALTEZZA_BARRA = 24
 
-type IdFinestra = `cartella:${Disciplina}` | 'informazioni' | 'progetto'
+type IdFinestra = `cartella:${Disciplina}` | `app:${App}` | 'informazioni' | 'progetto'
+const ICONE_APP: Record<App, () => ReactNode> = { scacchi: IconaScacchi, paint: IconaPaint, dediche: IconaDediche }
 type Vista = 'icone' | 'nome'
 type StatoNavigazione = { dalComputer?: boolean } | null
 
 const titoloDi = (id: IdFinestra, progetto?: Progetto) =>
-  id === 'progetto' ? (progetto?.titolo ?? '') : id === 'informazioni' ? sito.computer.voci.informazioni : id.slice('cartella:'.length)
+  id === 'progetto'
+    ? (progetto?.titolo ?? '')
+    : id === 'informazioni'
+      ? sito.computer.voci.informazioni
+      : id.startsWith('app:')
+        ? sito.app[id.slice('app:'.length) as App].nome
+        : id.slice('cartella:'.length)
 
 /** clic seleziona, doppio clic apre; con tocco, penna o tastiera basta un’attivazione */
 function useAttivazione(onSeleziona: () => void, onApri: () => void) {
   const tipo = useRef('mouse')
   return {
     onPointerDown: (e: PointerEvent) => (tipo.current = e.pointerType),
-    onClick: (e: MouseEvent) => (e.detail === 0 || tipo.current !== 'mouse' ? onApri() : onSeleziona()),
+    onClick: (e: MouseEvent) => {
+      clic()
+      if (e.detail === 0 || tipo.current !== 'mouse') onApri()
+      else onSeleziona()
+    },
     onDoubleClick: onApri,
   }
 }
@@ -126,6 +141,15 @@ export function Finder({ larghezza, altezza, telefono, scala }: Props) {
         const l = Math.min(360, larghezza - 40)
         return { x: Math.round((larghezza - l) / 2), y: Math.round(alta * 0.2), larghezza: l, altezza: Math.min(220, alta - 40) }
       }
+      if (id.startsWith('app:')) {
+        const app = id.slice('app:'.length) as App
+        // paint: quasi tutto lo schermo; scacchi: una scacchiera quadrata; dediche: una cartella grande
+        const l = app === 'paint' ? Math.min(larghezza - 24, 760) : app === 'scacchi' ? Math.min(larghezza - 40, 420) : Math.min(larghezza - 40, 500)
+        const h = app === 'paint' ? alta - 16 : app === 'scacchi' ? Math.min(alta - 24, 470) : Math.min(alta - 30, 400)
+        const base = { x: Math.max(8, Math.round((larghezza - l) / 2) + (app === 'dediche' ? 24 : 0)), y: Math.max(6, Math.round((alta - h) / 2)) }
+        const p = posizioni[id] ?? base
+        return { ...p, larghezza: l, altezza: h }
+      }
       const i = CARTELLE.indexOf(id.slice('cartella:'.length) as Disciplina)
       const l = Math.min(Math.round(larghezza * 0.6), 440)
       const base = { x: 18 + i * 22, y: 14 + i * 20 }
@@ -146,6 +170,8 @@ export function Finder({ larghezza, altezza, telefono, scala }: Props) {
     setAnnuncio(sito.computer.aperta(titoloDi(id, progetto)))
     // aprendo una cartella il volto sbatte le palpebre
     if (id.startsWith('cartella:')) azione('battito')
+    // aprendo un’applicazione il disco lavora
+    if (id.startsWith('app:')) disco()
   }
 
   const apriProgetto = (p: Progetto) => {
@@ -175,7 +201,7 @@ export function Finder({ larghezza, altezza, telefono, scala }: Props) {
   const davanti = aperte.at(-1)
   const apriSelezione = () => {
     if (!selezione) return
-    if (selezione.startsWith('cartella:')) apriFinestra(selezione as IdFinestra)
+    if (selezione.startsWith('cartella:') || selezione.startsWith('app:')) apriFinestra(selezione as IdFinestra)
     else {
       const p = trovaProgetto(selezione.slice('file:'.length))
       if (p) apriProgetto(p)
@@ -231,6 +257,7 @@ export function Finder({ larghezza, altezza, telefono, scala }: Props) {
   const contenuto = (id: IdFinestra) => {
     if (id === 'progetto') return progetto && <Documento progetto={progetto} />
     if (id === 'informazioni') return <Informazioni />
+    if (id.startsWith('app:')) return <ContenutoApp app={id.slice('app:'.length) as App} onApri={(app) => apriFinestra(`app:${app}`)} />
     const elenco = perCartella[id.slice('cartella:'.length) as Disciplina]
     if (vista === 'nome')
       return (
@@ -301,6 +328,25 @@ export function Finder({ larghezza, altezza, telefono, scala }: Props) {
               </Icona>
             </li>
           ))}
+          {APPLICAZIONI.map((app) => {
+            const Disegno = ICONE_APP[app]
+            return (
+              <li key={app}>
+                <Icona
+                  etichetta={sito.app[app].nome}
+                  data-icona={`app:${app}`}
+                  selezionata={selezione === `app:${app}`}
+                  onSeleziona={() => setSelezione(`app:${app}`)}
+                  onApri={() => {
+                    setSelezione(`app:${app}`)
+                    apriFinestra(`app:${app}`)
+                  }}
+                >
+                  <Disegno />
+                </Icona>
+              </li>
+            )
+          })}
         </ul>
         {aperte.map((id, i) => {
           const r = rettangoloDi(id)

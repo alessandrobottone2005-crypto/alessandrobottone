@@ -1,6 +1,6 @@
 # computer
 
-Il portfolio è un computer beige appoggiato sul pavimento della sala di cemento, nel fascio di luce della fessura. Dopo l’header la camera abbassa lo sguardo e scende fino a inquadrare monitor, tastiera e mouse. Il computer è spento: si accende con un clic (o tocco) sul monitor o sul mouse 3d, o con Invio su un pulsante invisibile sopra il monitor; parte la sequenza di avvio e la camera entra verso lo schermo. Una volta acceso resta acceso. Sullo schermo c’è un’interfaccia che riprende il Finder del Macintosh 1984: scrivania con una cartella per disciplina (illustrazione, branding, 3d; web design torna con `webDesignAttivo` in `src/config/discipline.ts`) e, dentro, un documento per progetto.
+Il portfolio è un computer beige appoggiato sul pavimento della sala di cemento, nel fascio di luce della fessura. Dopo l’header la camera abbassa lo sguardo e scende fino a inquadrare monitor, tastiera e mouse. Il computer è spento: si accende con un clic (o tocco) sul monitor o sul mouse 3d, o con Invio su un pulsante invisibile sopra il monitor; parte la sequenza di avvio e la camera entra verso lo schermo. Una volta acceso resta acceso. Sullo schermo c’è un’interfaccia che riprende il Finder del Macintosh 1984: scrivania con una cartella per disciplina (illustrazione, branding, 3d; web design torna con `webDesignAttivo` in `src/config/discipline.ts`) e, dentro, un documento per progetto. Sulla scrivania ci sono anche tre applicazioni: «scacchi», «paint» e «dediche» ([applicazioni](#applicazioni)).
 
 Regole concordate il 1 ottobre 2026: dentro lo schermo bianco e nero e carattere ChicagoFLF (eccezione alle regole 1 e 2 di `CLAUDE.md`, valida solo lì); copertine e immagini dei progetti sempre a colori; testi in minuscolo come nel resto del sito. Dal 2 ottobre 2026 bianco e nero non sono più puri: sono i fosfori di un tubo vero (`--mac-bianco` #e7e1d1, `--mac-nero` #161614).
 
@@ -28,6 +28,8 @@ Nella scena 3d il piano di luce davanti al vetro ha il colore dei fosfori ed è 
 | `src/components/computer/Interfaccia.tsx` | DOM posato sul vetro, effetto tubo catodico |
 | `src/components/computer/Finder.tsx` | barra dei menu, scrivania, cartelle, documenti, finestra del progetto legata all’indirizzo |
 | `Finestra.tsx`, `BarraMenu.tsx`, `icone.tsx`, `voltoPixel.ts`, `computer.css` | finestre, menu, icone 1-bit e stile |
+| `src/components/computer/app/` | applicazioni della scrivania (scacchi, paint, dediche), caricate solo all’apertura |
+| `api/dediche.ts` | funzione Vercel delle dediche (archivio su Google Drive) |
 | `src/components/volto/ComputerNellaScena.tsx`, `modelloComputer.ts`, `Mondo.tsx`, `ScenaRidotta.tsx` | modello 3d, bagliore del vetro, impulso del mouse, movimento del mondo, scena ferma |
 
 ## come si muove
@@ -78,10 +80,32 @@ Il rettangolo del vetro (`VETRO` in `inquadratura.ts`) è misurato in Blender co
 - clic seleziona, doppio clic apre; con tocco, penna o tastiera basta un’attivazione (Invio o Spazio).
 - cartelle: finestra trascinabile con il mouse dalla barra del titolo; vista «per icona» (documento con la copertina a colori) o «per nome» (elenco con anno e discipline).
 - documento: la finestra del progetto mostra copertina, discipline · anno · cliente, descrizione e blocchi. Segue l’indirizzo `/progetti/:slug`: aprirla aggiunge una voce alla cronologia, indietro la chiude, un link diretto porta la home davanti al computer già acceso con la finestra aperta.
-- menu: volto (informazioni e crediti), archivio (apri, chiudi), vista (per icona, per nome), speciale (riordina le finestre).
+- menu: volto (informazioni e crediti), archivio (apri, chiudi; vale anche per le applicazioni), vista (per icona, per nome), speciale (riordina le finestre).
 - chiusura: casella a sinistra nella barra del titolo, «archivio → chiudi» o Esc (con una tendina aperta, Esc chiude prima la tendina). Il focus torna all’icona che aveva aperto la finestra.
 - rotella e tocco: dentro una finestra scorre la finestra; sulla scrivania scorre la pagina.
 - su telefono ogni finestra occupa la scrivania.
+
+## applicazioni
+
+Tre icone sotto le cartelle (`app/elenco.ts`). Si aprono come le cartelle (doppio clic, un tocco o Invio), in finestre del Finder trascinabili con casella di chiusura ed Esc; il focus torna all’icona. Su telefono occupano la scrivania. Il codice di ognuna è un chunk a parte (`app/Applicazioni.tsx`, `React.lazy`): nel caricamento iniziale entrano solo le icone. Suoni (`app/suoni.ts`, motore in `src/lib/audio/motore.ts`): `clic` a ogni scelta, `disco` all’apertura di un’applicazione, `floppy` all’invio di una dedica. Testi in `sito.app` (`src/config/sito.ts`), stile in `app/app.css` (stessi fosfori, trama e ChicagoFLF del Finder). Pezzi e strumenti sono disegnati a pixel nel codice (`app/pixel.tsx`): nessun file né licenza esterna.
+
+### scacchi
+
+- Si gioca con i bianchi contro il computer. Regole di [chess.js](https://github.com/jhlywa/chess.js) (BSD-2, unica dipendenza aggiunta il 2 ottobre 2026): mosse legali, arrocco, en passant, promozione, scacco, scaccomatto e patta (stallo, materiale insufficiente, tripla ripetizione, cinquanta mosse).
+- Avversario scritto per il sito (`app/scacchi/avversario.ts`): negamax con potatura alfa-beta, valutazione materiale + posizione (tabelle «semplificate» di Michniewski), catture ordinate per prime. «facile» profondità 2 con un po’ di casualità, «medio» profondità 3; approfondimento iterativo con un tempo massimo (1,2 / 3 s), così non si blocca mai. Gira in un web worker (`avversario.worker.ts`): la scena 3d resta fluida mentre pensa. Misurato in Node sul Mac: prima risposta ≈ 0,2 s (facile) e ≈ 0,6 s (medio).
+- Scacchiera `role="grid"`: clic o tocco su un pezzo e poi sulla casa (le mete sono un quadratino, le prese un riquadro), da tastiera frecce e Invio, Esc annulla la scelta. Promozione con scelta del pezzo. Stato annunciato (`role="status"`), mosse del computer annunciate.
+- Volto: occhiolino quando il computer dà scacco, sorriso quando vinci.
+
+### paint
+
+- Tela 1-bit 512×342 (`app/paint/tela.ts`): matita (partendo da un punto nero cancella, come nel 1984), pennello (spessori 1, 2, 4, 8 con la trama scelta), gomma, linea, rettangolo vuoto e pieno, secchiello; dieci trame 8×8; annulla (24 passi) e cancella tutto.
+- Mouse, penna e tocco con pointer events; `touch-action: none` sulla tela. Il punto si legge da `offsetX/offsetY`, già nelle coordinate locali anche con la `matrix3d` dello schermo. Da tastiera: frecce (maiuscolo: 8 pixel) e Invio/Spazio per abbassare e alzare la punta (linea e rettangolo: primo e secondo punto; secchiello: riempie).
+- Sotto: dedica (massimo 140 caratteri), nome facoltativo e pubblico, «invia». Il png è a 1 bit con la palette dei fosfori (pochi kB), codificato nel browser con `CompressionStream`. Dopo l’invio si apre la cartella «dediche» con la nuova voce in testa.
+
+### dediche
+
+- Cartella pubblica: i disegni inviati, visibili subito a tutti, i più recenti per primi, 12 per pagina; «aggiorna». Ogni voce si apre (disegno, dedica, nome, data) e ha «segnala»: dopo 3 segnalazioni la voce sparisce. Esc nel dettaglio torna all’elenco.
+- Dati da `/api/dediche` (`api/dediche.ts`): archivio su Google Drive, immagini servite dalla funzione. In sviluppo un archivio in memoria (`vite.config.ts`), in produzione senza variabili un avviso gentile. Guida per attivarle: [dediche su google drive](dediche-google-drive.md).
 
 ## accessibilità
 
