@@ -63,9 +63,12 @@ function Catena({ sala, fermo }: { sala: boolean; fermo: boolean }) {
   useEffect(() => () => fuoco.dispose(), [fuoco])
   useFrame(({ camera }) => {
     const s = percorso.stazione
-    const verso = morbido(0.35, 0.95, s) * (1 - morbido(1, 1.35, s))
+    // il computer entra a fuoco presto: computer e volto dietro il monitor nitidi, sala lontana sfocata
+    const verso = morbido(0.05, 0.45, s) * (1 - morbido(1, 1.35, s))
     schermo.copy(centroSchermo).applyMatrix4(scenaImmersiva.mondo)
     bersaglio.copy(scenaImmersiva.logo).lerp(schermo, verso)
+    // eslint-disable-next-line react/immutability -- effetto di postprocessing, non stato React
+    fuoco.cocMaterial.focusRange = cinema.fuoco.intervallo + (cinema.fuoco.intervalloComputer - cinema.fuoco.intervallo) * verso
     scenaImmersiva.fuoco = camera.position.distanceTo(bersaglio)
   })
 

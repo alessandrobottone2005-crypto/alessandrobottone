@@ -203,6 +203,9 @@ function Stanza({ risorse, fermo }: { risorse: RisorseSala; fermo: boolean }) {
     rotazione.extractRotation(scenaImmersiva.mondo)
     stato.scene.environmentRotation.setFromRotationMatrix(rotazione)
     sole.updateMatrixWorld()
+    // la camera d’ombra ruota con la sala: con l’alto del mondo (0,1,0) la mappa disegnata una volta
+    // verrebbe letta ruotata attorno al fascio mentre la discesa inclina la sala (macchie sul computer)
+    sole.shadow.camera.up.set(0, 1, 0).transformDirection(scenaImmersiva.mondo)
     sole.shadow.updateMatrices(sole)
   }, -0.85)
 

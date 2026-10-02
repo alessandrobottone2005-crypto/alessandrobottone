@@ -1,8 +1,9 @@
 // parametri della resa «cinema» della scena 3d (claude.md §6, docs/ambiente-3d.md).
 // ogni effetto si spegne con ?senza=fuoco,polvere,grana,alone,aberrazione,striscia,colore,respiro per i confronti.
 export const cinema = {
-  // profondità di campo: il fuoco segue il protagonista (volto, poi schermo del computer)
-  fuoco: { intervallo: 3.2, bokeh: 3.2, bokehBasso: 1.8 },
+  // profondità di campo: il fuoco segue il protagonista (volto, poi schermo del computer);
+  // vicino al computer la zona nitida si allarga a tutto il computer (scala ×4) e al volto dietro il monitor
+  fuoco: { intervallo: 3.2, intervalloComputer: 7, bokeh: 3.2, bokehBasso: 1.8 },
   // polvere nel fascio della fessura
   polvere: { quante: 9000, misura: 0.006, luce: 1.1, scintillio: 0.75 },
   // grana pellicola (dopo la tonalità), alone attorno alle luci, aberrazione ai bordi

@@ -56,21 +56,23 @@ export function RotolaAlPassaggio({ testo, attivo, sfalsamento = 0.022, classNam
   const lettere = [...testo]
 
   return (
-    <span ref={radice} className={`relative inline-flex overflow-hidden align-bottom ${className ?? ''}`}>
+    // ogni lettera ha un margine sopra e sotto dentro il ritaglio: discendenti (g) e accenti della copia
+    // nascosta non entrano nel riquadro; il margine negativo tiene l’ingombro di una riga
+    <span ref={radice} className={`relative -my-[0.15em] inline-flex overflow-hidden align-bottom ${className ?? ''}`}>
       {/* testo vero, una volta sola, per gli screen reader */}
       <span className="sr-only">{testo}</span>
       <span aria-hidden="true" className="inline-flex whitespace-pre">
         {lettere.map((lettera, i) => (
           <motion.span
             key={i}
-            className="relative inline-block"
+            className="relative inline-block py-[0.15em]"
             initial={false}
             animate={{ y: su ? '-100%' : '0%' }}
             transition={{ duration: 0.45, ease, delay: i * sfalsamento }}
           >
             {lettera}
             {/* la copia che arriva dal basso */}
-            <span className="absolute top-full left-0">{lettera}</span>
+            <span className="absolute top-full left-0 py-[0.15em]">{lettera}</span>
           </motion.span>
         ))}
       </span>

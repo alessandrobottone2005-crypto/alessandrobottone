@@ -47,8 +47,10 @@ export function ChiSono() {
           onSplit: (self) => {
             uscita?.scrollTrigger?.kill()
             uscita?.kill()
-            // Su schermi troppo bassi il testo resta in flusso normale, senza parole fuori dal pin.
-            const pin = testo.getBoundingClientRect().height < innerHeight * 0.86 && innerHeight > 500
+            // Su schermi troppo bassi il testo resta in flusso normale, senza parole fuori dal pin
+            // (su telefono conta anche l’avatar sopra il testo: si misura tutta la griglia).
+            const contenuto = testo.parentElement ?? testo
+            const pin = contenuto.getBoundingClientRect().height < innerHeight * 0.86 && innerHeight > 500
             gsap.set(percorso.biografia, { uscita: 0, ologramma: 0 })
             const scambio = movimento.chiSono.scambio
             const tl = gsap.timeline({
@@ -120,10 +122,11 @@ export function ChiSono() {
         {sito.sezioni.chiSono}
       </h2>
       <div ref={palco} className="flex min-h-svh items-center px-4 py-12 md:px-8 md:py-16 lg:px-12">
-        <div className="grid w-full grid-cols-[minmax(64px,20vw)_minmax(0,1fr)] items-center gap-4 md:grid-cols-12 md:gap-8">
+        {/* telefono: avatar centrato sopra il testo; da 768px avatar a sinistra e testo a destra */}
+        <div className="grid w-full grid-cols-1 items-center gap-6 md:grid-cols-12 md:gap-8">
           <div
             data-logo-biografia
-            className="aspect-[4/5] w-full md:col-span-5 md:max-w-[48svh] md:justify-self-start"
+            className="aspect-[4/5] w-[min(52vw,30svh)] justify-self-center md:col-span-5 md:w-full md:max-w-[48svh] md:justify-self-start"
           >
             {/* movimento ridotto o 3d non disponibile: l’avatar fermo, in palette, con le righe di scansione */}
             <div className="relative hidden size-full motion-reduce:block in-data-volto-riserva:block">

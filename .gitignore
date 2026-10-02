@@ -58,3 +58,8 @@ sorgenti/progetti/*
 !sorgenti/progetti/README.md
 # modelli 3d prima della compressione (decine di MB): restano sul disco, nel sito c’è la versione compressa
 src/content/progetti/*/_originali/*.glb
+
+# screenshot dei test e audio originali (restano sul computer)
+sorgenti/test-*/
+sorgenti/audio/*.mp3
+sorgenti/audio/*.wav

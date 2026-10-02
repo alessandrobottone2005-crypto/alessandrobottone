@@ -15,6 +15,7 @@
     "foto-palette": "node scripts/foto-palette.mjs",
     "prepara-avatar": "node scripts/prepara-avatar.mjs",
     "genera-favicon": "node scripts/genera-favicon.mjs",
+    "genera-favicon-3d": "node scripts/genera-favicon-3d.mjs",
     "genera-og": "node scripts/genera-og.mjs",
     "genera-nome-3d": "node scripts/genera-nome-3d.mjs",
     "comprimi-pdf": "swift scripts/comprimi-pdf.swift",

@@ -45,7 +45,7 @@ Zod non è nel runtime di produzione; shadcn è uno strumento di sviluppo, i com
 │  ├─ computer/              computer.glb (da npm run prepara-computer)
 │  ├─ nome/                  contorni delle lettere del nome (da npm run genera-nome-3d)
 │  ├─ sala/                  sala.glb e luce cotta (da npm run prepara-sala)
-│  ├─ volto/                 logo-metallo-v2.glb, favicon, icona iOS, crediti
+│  ├─ volto/                 logo-metallo-v2.glb, favicon e icona iOS dal render 3d (npm run genera-favicon-3d), crediti
 │  ├─ og.png
 │  └─ robots.txt
 ├─ index.html                meta, lingua, titolo e favicon

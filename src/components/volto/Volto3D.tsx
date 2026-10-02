@@ -28,8 +28,10 @@ import { PARTI_DA_RISCALDARE, riscaldamento } from './riscaldamento'
 function senzaSole(m: THREE.Material) {
   if (m.userData.senzaSole) return
   m.userData.senzaSole = true
+  // gli #include si espandono dopo onBeforeCompile: si sostituisce il blocco delle luci già espanso
+  const luci = THREE.ShaderChunk.lights_fragment_begin.replace('#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )', '#if 0')
   m.onBeforeCompile = (shader) => {
-    shader.fragmentShader = shader.fragmentShader.replace('#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )', '#if 0')
+    shader.fragmentShader = shader.fragmentShader.replace('#include <lights_fragment_begin>', luci)
   }
   m.customProgramCacheKey = () => 'volto-senza-sole'
 }

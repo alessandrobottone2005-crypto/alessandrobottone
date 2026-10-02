@@ -58,7 +58,7 @@ tutto dentro l’svg è animato da gsap:
 
 - **sonno**: dopo 8 secondi senza input (`movimento.volto.sonnoDopo`; input = movimento del mouse, tocco, tasti, rotella, scroll) l’umore diventa `dorme`.
 - **risveglio**: al primo input torna `naturale` e, dopo 0,4s, tutti i volti sbattono le palpebre.
-- **scheda non attiva**: il titolo diventa `zzz… torna qui` (`sito.titoloAssente`), la favicon passa a `/volto/favicon-dorme.svg` e i volti dormono. tornando sulla scheda: titolo e favicon di prima, risveglio con battito.
+- **scheda non attiva**: il titolo diventa `zzz… torna qui` (`sito.titoloAssente`), la favicon passa a `/volto/favicon-dorme.png` e i volti dormono. tornando sulla scheda: titolo e favicon di prima, risveglio con battito.
 - **azioni per tutti**: `azione('battito' | 'occhiolino' | 'sorriso')` fa compiere l’azione a tutti i volti montati.
 
 un volto con `stato` esplicito ignora l’umore globale (per esempio il preloader, o i contatti prima di essere disegnati).
@@ -100,10 +100,12 @@ dove si usa `guarda`: nell’header il volto ogni tanto guarda in basso (invito 
 
 ## favicon
 
-`npm run genera-favicon` (`scripts/genera-favicon.mjs`) usa `svgStatico()` di `geometria.ts` per creare, in `public/volto/`:
+Le favicon sono il render 3d vero del sito: il logo metallico davanti alla sala, inquadratura dei contatti (scelta di alessandro del 2 ottobre 2026). `npm run genera-favicon-3d -- [url] [cartella]` (`scripts/genera-favicon-3d.mjs`) apre il sito acceso (`npm run build && npm run preview`, di base `http://localhost:4173/`) in Chrome senza finestra con la gpu del Mac, scorre fino ai contatti, nasconde pulsanti, copyright, nome fisso, grana e cursore, scatta e ritaglia un quadrato attorno al logo con un po’ più di luce (il metallo scuro deve leggersi anche a 16 px). Crea in `public/volto/`:
 
-- `favicon.svg`: volto sveglio su fondo nero
-- `favicon-dorme.svg`: volto con gli occhi chiusi (usata quando la scheda non è attiva)
+- `favicon.png` (96 px): volto sveglio, con il puntatore al centro per lo sguardo dritto
+- `favicon-dorme.png` (96 px): volto addormentato dopo il sonno per inattività (usata quando la scheda non è attiva)
 - `apple-touch-icon.png`: 180 px, per safari e ios
 
-se cambi la geometria del volto, rilancia questo comando (e `npm run genera-og`).
+Con il secondo argomento le scrive in un’altra cartella, per provarle prima di sostituirle. Se cambiano logo, luci o sala, rilancia il comando.
+
+La versione vettoriale di prima (`npm run genera-favicon`, da `svgStatico()` di `geometria.ts`) resta come riserva in `sorgenti/logo/favicon-svg/` e non si pubblica; se cambi la geometria del volto rilancia anche `npm run genera-og`.

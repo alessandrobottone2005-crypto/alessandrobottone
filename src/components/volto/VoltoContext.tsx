@@ -19,7 +19,7 @@ type Valore = {
 
 const Contesto = createContext<Valore | null>(null)
 
-const FAVICON = { sveglio: '/volto/favicon.svg', dorme: '/volto/favicon-dorme.svg' }
+const FAVICON = { sveglio: '/volto/favicon.png', dorme: '/volto/favicon-dorme.png' }
 const INPUT = ['pointermove', 'pointerdown', 'keydown', 'wheel', 'touchstart', 'scroll'] as const
 
 function impostaFavicon(href: string) {
