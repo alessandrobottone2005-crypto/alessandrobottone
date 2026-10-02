@@ -1,5 +1,6 @@
 // preloader (claude.md §6.1): il volto si disegna in proporzione al caricamento reale, con gli occhi chiusi;
-// a 100 si sveglia, il contatore esce e il volto vola al suo posto nell’header.
+// a 100 si sveglia, il contatore esce e il volto vola al suo posto nell’header. Lo scroll si sblocca con il
+// pulsante «inizia a scrollare» (Ingresso.tsx), o subito con un link diretto a un progetto.
 import { useEffect, useRef, useState } from 'react'
 import { Volto, type ManigliaVolto, type StatoVolto } from '@/components/volto/Volto'
 import { media, movimento, volto as misure } from '@/config/movimento'
@@ -7,8 +8,6 @@ import { avviaCaricamento } from '@/lib/caricamento'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { fermaScroll, riprendiScroll } from '@/lib/scroll'
 import { useAvvio } from './AvvioContext'
-import { InvitoScorrere } from './InvitoScorrere'
-import { scriviInvito } from './invito'
 
 const CHIAVE_SESSIONE = 'ab-visitato'
 
@@ -21,7 +20,7 @@ function giaVisitato() {
 }
 
 export function Preloader() {
-  const { setPronto, voltoHeader } = useAvvio()
+  const { setPronto, entrato, voltoHeader } = useAvvio()
   const [finito, setFinito] = useState(false)
   const [stato, setStato] = useState<StatoVolto>('dorme')
   const radice = useRef<HTMLDivElement>(null)
@@ -36,10 +35,10 @@ export function Preloader() {
     return riprendiScroll
   }, [])
 
-  // a preloader finito lo scroll torna libero (il componente resta montato, quindi non basta la pulizia sopra)
+  // a preloader finito e ingresso fatto lo scroll torna libero (il componente resta montato, quindi non basta la pulizia sopra)
   useEffect(() => {
-    if (finito) riprendiScroll()
-  }, [finito])
+    if (finito && entrato) riprendiScroll()
+  }, [finito, entrato])
 
   useGSAP(
     () => {
@@ -55,10 +54,7 @@ export function Preloader() {
       const scrivi = (p: number) => {
         if (contatore.current) contatore.current.textContent = String(Math.round(p * 100)).padStart(3, '0')
         volto.current?.disegna(p)
-        // «scorri per esplorare» si scrive insieme al volto
-        scriviInvito(radice.current, p)
       }
-      gsap.set(radice.current!.querySelector('[data-invito-freccia]'), { opacity: 0 })
       scrivi(0)
 
       const fine = () => {
@@ -81,8 +77,6 @@ export function Preloader() {
           .call(() => volto.current?.battito(), [], 0.5)
           // il contatore esce verso il basso
           .to(contatore.current, { yPercent: 110, duration: 0.6, ease: movimento.ease.transizione }, 0.3)
-          // al risveglio compare la freccia
-          .to(radice.current!.querySelector('[data-invito-freccia]'), { opacity: 1, duration: 0.5 }, 0.2)
         // il volto vola al suo posto nell’header
         tl.add(() => {
           const da = involucro.current?.getBoundingClientRect()
@@ -129,7 +123,6 @@ export function Preloader() {
       <div ref={involucro} className="will-change-transform">
         <Volto ref={volto} stato={stato} dimensione={misure.preloader} interattivo={false} />
       </div>
-      <InvitoScorrere />
       <p className="absolute right-4 bottom-4 overflow-hidden text-etichetta md:right-8 md:bottom-8" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <span ref={contatore} className="block text-[clamp(2.5rem,6vw,5rem)] leading-none font-extralight cifre-tabellari">
           000

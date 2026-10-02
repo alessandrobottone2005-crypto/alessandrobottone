@@ -1,5 +1,8 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { useLocation } from 'react-router'
+import { AudioComputer } from './components/audio/AudioComputer'
+import { Ingresso } from './components/audio/Ingresso'
+import { PulsanteAudio } from './components/audio/PulsanteAudio'
 import { Cursore } from './components/cursore/Cursore'
 import { LogoContinuo } from './components/volto/LogoContinuo'
 import { Grana } from './components/effetti/Grana'
@@ -21,7 +24,7 @@ const Laboratorio = import.meta.env.DEV ? lazy(() => import('./laboratorio/Labor
 
 export default function App() {
   const { pathname } = useLocation()
-  const { pronto } = useAvvio()
+  const { pronto, entrato } = useAvvio()
   const laboratorio = Boolean(Laboratorio) && pathname === '/laboratorio'
 
   useEffect(() => {
@@ -63,7 +66,8 @@ export default function App() {
 
   return (
     <>
-      <main aria-busy={!pronto}>
+      {/* fino all’ingresso la pagina non si usa: niente focus o scroll verso elementi nascosti */}
+      <main aria-busy={!pronto} inert={!entrato}>
         <Header />
         <Portfolio />
         <ChiSono />
@@ -72,6 +76,9 @@ export default function App() {
       <LogoContinuo />
       {pronto && <RotteModali />}
       <Preloader />
+      <Ingresso />
+      <PulsanteAudio />
+      <AudioComputer />
       <Cursore />
       <Grana />
     </>

@@ -38,9 +38,11 @@ Zod non è nel runtime di produzione; shadcn è uno strumento di sviluppo, i com
 │  ├─ computer/              Computer.glb originale
 │  ├─ progetti/              pdf originali dei progetti, solo sul disco (ignorati da git)
 │  ├─ font/                  Outfit-Black.ttf statico (OFL) per il nome in metallo
+│  ├─ audio/                 musica e suoni originali, solo sul disco; fonti e licenze nel README
 │  ├─ ambiente/              greybox brutalista non più usata, conservata
 │  └─ foto/                  foto originali (FotoMie/), materiali Google Flow (flow/), prima prova avatar (avatar/)
 ├─ public/                   asset serviti senza trasformazione
+│  ├─ audio/                 musica in loop e suoni brevi, webm e m4a (da npm run prepara-audio)
 │  ├─ avatar/                atlante dell’avatar a punti giro.webp e fermo.webp (da npm run prepara-avatar)
 │  ├─ computer/              computer.glb (da npm run prepara-computer)
 │  ├─ nome/                  contorni delle lettere del nome (da npm run genera-nome-3d)
@@ -56,13 +58,14 @@ Zod non è nel runtime di produzione; shadcn è uno strumento di sviluppo, i com
    ├─ main.tsx, App.tsx, router.tsx
    ├─ config/                sito.ts e movimento.ts
    ├─ styles/                globals.css
-   ├─ lib/                   scroll, GSAP, caricamento, dati/schema/progetti, appunti, useMediaQuery
+   ├─ lib/                   scroll, GSAP, caricamento, dati/schema/progetti, appunti, useMediaQuery, audio/ (motore)
    ├─ components/
    │  ├─ volto/              SVG, context, sguardo, logo V2, avatar, sala, mondo, computer 3d e post-produzione
    │  ├─ computer/           interfaccia finder 1984, inquadratura, stato, finestre e blocchi lazy (blocchi/)
    │  ├─ nome/               nome e cognome in metallo (Canvas leggero a parte) e caricamento del font
    │  ├─ cursore/            cursore e segnale cursore:ricalcola
    │  ├─ preloader/, testo/, interazioni/, effetti/
+   │  ├─ audio/              ingresso «inizia a scrollare», pulsante audio, audio del computer
    │  ├─ bottoni/, icone/     componenti Figma
    │  └─ ui/                 button shadcn di base, non usato
    ├─ sections/
@@ -82,7 +85,7 @@ Zod non è nel runtime di produzione; shadcn è uno strumento di sviluppo, i com
 1. `main.tsx`: `BrowserRouter` → `VoltoProvider` → `AvvioProvider` → `App` e stile globale.
 2. `App.tsx`: avvia scroll, monta le quattro sezioni, `LogoContinuo`, preloader, cursore e grana; `main` resta `aria-busy` fino a sito pronto.
 3. `caricamento.ts`: misura font, codice 3d, GLB V2 condivisa, nome in metallo (codice e contorni) e prima copertina. Un errore non impedisce la fine del preloader. Il ramo movimento ridotto evita codice e asset 3d.
-4. `Preloader.tsx`: contatore e disegno, risveglio, passaggio all’header, riavvio scroll. Durate in `movimento.preloader`.
+4. `Preloader.tsx`: contatore e disegno, risveglio, passaggio all’header. Durate in `movimento.preloader`. Lo scroll riparte con il pulsante «inizia a scrollare» (`components/audio/Ingresso.tsx`), che avvia anche l’audio; con un link diretto subito. [Audio](audio.md).
 5. A sito pronto: refresh delle misure e rotte; con link diretto a un progetto la home va a metà della sosta davanti al computer acceso, con la finestra del progetto aperta, su tutti i dispositivi. Il modello del computer e l’interfaccia si scaricano dopo il preloader.
 
 ## scena continua
