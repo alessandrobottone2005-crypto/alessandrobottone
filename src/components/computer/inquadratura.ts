@@ -5,7 +5,7 @@
 import { Matrix4, Quaternion, Vector3, MathUtils } from 'three'
 import { movimento } from '@/config/movimento'
 import sala from '@/components/volto/stazioniSala.json'
-import { misureScena } from '@/components/volto/percorso'
+import { misureScena, percorso } from '@/components/volto/percorso'
 
 const C = movimento.computer
 // Campo 40°: si vede la sala in profondità. La distanza tiene il piano del volto identico a prima (20 · tan 9°).
@@ -56,6 +56,56 @@ function distanzaSosta(aspetto: number, mobile: boolean) {
   return Math.max(altezzaVetro / (2 * tangente * C.altezzaSchermo), larghezzaVetro / (2 * tangente * aspetto * C.larghezzaSchermo))
 }
 
+// Ingombri nello spazio del modello, misurati con gltf-transform. Il mouse e la tastiera stanno nella stessa
+// mesh («keyboard2»): il mouse è il gruppo di vertici a destra della tastiera, vicino al cavo.
+// Ingombro del monitor (tubo e cornice, senza case e tastiera): mesh «monik2».
+const MONITOR = { min: new Vector3(-0.29, 0.184, -0.266), max: new Vector3(0.283, 0.771, 0.236) }
+export const MOUSE = { min: new Vector3(-0.63, 0, 0.19), max: new Vector3(-0.44, 0.045, 0.35) }
+const TASTIERA = { min: new Vector3(-0.66, 0, -0.46), max: new Vector3(-0.34, 0.08, 0.16) }
+type Scatola = { min: Vector3; max: Vector3 }
+const angoliDi = (b: Scatola) =>
+  [0, 1, 2, 3, 4, 5, 6, 7].map((i) =>
+    new Vector3(i & 1 ? b.max.x : b.min.x, i & 2 ? b.max.y : b.min.y, i & 4 ? b.max.z : b.min.z).applyMatrix4(matriceComputer),
+  )
+const angoliMonitor = angoliDi(MONITOR)
+const angoliMouse = angoliDi(MOUSE)
+
+/**
+ * Inquadratura larga (computer spento): monitor, tastiera e mouse con un po’ di spazio sopra per il volto,
+ * vista un po’ dall’alto. La distanza è la minima che fa stare tutti gli angoli nella frazione di vista voluta.
+ */
+const L = C.larga
+const angoliLarga = angoliDi({
+  min: new Vector3(Math.min(TASTIERA.min.x, MOUSE.min.x), 0, Math.min(TASTIERA.min.z, MONITOR.min.z)),
+  max: new Vector3(MONITOR.max.x, MONITOR.max.y + L.testa, Math.max(MOUSE.max.z, MONITOR.max.z)),
+})
+const miraLarga = angoliLarga.reduce((s, v) => s.add(v), new Vector3()).multiplyScalar(1 / 8)
+const versoLarga = new Vector3(0, 0, 1)
+  .applyAxisAngle(new Vector3(1, 0, 0), -MathUtils.degToRad(L.elevazione))
+  .applyAxisAngle(new Vector3(0, 1, 0), MathUtils.degToRad(L.lato))
+const destraLarga = new Vector3(0, 1, 0).cross(versoLarga).normalize()
+const suLarga = versoLarga.clone().cross(destraLarga)
+const distanzaLargaCache = new Map<string, number>()
+function distanzaLarga(aspetto: number, mobile: boolean) {
+  const chiave = `${aspetto.toFixed(3)}${mobile}`
+  let d = distanzaLargaCache.get(chiave)
+  if (d !== undefined) return d
+  const r = mobile ? L.riempieTelefono : L.riempie
+  const v = new Vector3()
+  d = 0
+  for (const a of angoliLarga) {
+    v.subVectors(a, miraLarga)
+    const profondo = v.dot(versoLarga)
+    d = Math.max(
+      d,
+      profondo + Math.abs(v.dot(destraLarga)) / (tangente * aspetto * r.larghezza),
+      profondo + Math.abs(v.dot(suLarga)) / (tangente * r.altezza),
+    )
+  }
+  distanzaLargaCache.set(chiave, d)
+  return d
+}
+
 const liscio = (t: number) => {
   const v = MathUtils.clamp(t, 0, 1)
   return v * v * (3 - 2 * v)
@@ -70,7 +120,7 @@ function cubica(a: Vector3, b: Vector3, c: Vector3, d: Vector3, t: number, out: 
     .addScaledVector(d, t * t * t)
 }
 
-const tmp = { a: new Vector3(), b: new Vector3(), c: new Vector3(), d: new Vector3(), e: new Vector3(), f: new Vector3() }
+const tmp = { a: new Vector3(), b: new Vector3(), c: new Vector3(), d: new Vector3(), e: new Vector3(), f: new Vector3(), g: new Vector3() }
 const H = { occhio: occhioDi('header'), mira: punto('header') }
 const B = { occhio: occhioDi('biografia'), mira: punto('biografia') }
 const K = { occhio: occhioDi('contatti'), mira: punto('contatti') }
@@ -80,10 +130,13 @@ const ALTO = { occhio: COMPUTER.posizione.clone().add(new Vector3(0, 12, 13)), m
 /**
  * Camera «virtuale» dentro la sala per ogni punto del racconto.
  * stazione: 0 header → 1 sosta davanti al computer → 2 biografia → 3 contatti.
+ * zoom: nella sosta, 0 = inquadratura larga (spento), 1 = davanti allo schermo (acceso).
  */
-function occhioEMira(stazione: number, aspetto: number, mobile: boolean, occhio: Vector3, mira: Vector3) {
-  const d = distanzaSosta(aspetto, mobile)
-  const sosta = { occhio: tmp.e.copy(centroSchermo).add(new Vector3(0, 0, d)), mira: centroSchermo }
+function occhioEMira(stazione: number, aspetto: number, mobile: boolean, zoom: number, occhio: Vector3, mira: Vector3) {
+  const z = MathUtils.clamp(zoom, 0, 1)
+  const vicino = tmp.e.copy(centroSchermo).add(tmp.f.set(0, 0, distanzaSosta(aspetto, mobile)))
+  const lontano = tmp.f.copy(miraLarga).addScaledVector(versoLarga, distanzaLarga(aspetto, mobile))
+  const sosta = { occhio: vicino.lerp(lontano, 1 - z), mira: tmp.g.copy(miraLarga).lerp(centroSchermo, z) }
   const s = MathUtils.clamp(stazione, 0, 3)
   if (s <= 0.5) {
     // dall’header indietreggia e si alza: il computer appare a terra nel fascio
@@ -117,9 +170,12 @@ const mira = new Vector3()
 const alto = new Vector3(0, 1, 0)
 const cameraReale = new Matrix4().makeTranslation(CAMERA.x, CAMERA.y, CAMERA.z)
 
-/** trasformazione del mondo che fa vedere alla camera reale ciò che vedrebbe la camera virtuale */
-export function matriceMondo(stazione: number, aspetto: number, mobile: boolean, out: Matrix4) {
-  occhioEMira(stazione, aspetto, mobile, occhio, mira)
+/**
+ * trasformazione del mondo che fa vedere alla camera reale ciò che vedrebbe la camera virtuale;
+ * `zoom` di norma è quello corrente (percorso.computer.zoom)
+ */
+export function matriceMondo(stazione: number, aspetto: number, mobile: boolean, out: Matrix4, zoom = percorso.computer.zoom) {
+  occhioEMira(stazione, aspetto, mobile, zoom, occhio, mira)
   vista.lookAt(occhio, mira, alto).setPosition(occhio)
   return out.copy(cameraReale).multiply(vista.invert())
 }
@@ -129,9 +185,9 @@ const proiezione = new Matrix4()
 const p = new Vector3()
 
 /** i quattro angoli del vetro in pixel della vista: [x0,y0, x1,y1, x2,y2, x3,y3]; false se dietro la camera */
-export function proiettaSchermo(stazione: number, larghezza: number, altezza: number, out: number[]) {
+export function proiettaSchermo(stazione: number, larghezza: number, altezza: number, out: number[], zoom = percorso.computer.zoom) {
   const aspetto = larghezza / altezza
-  matriceMondo(stazione, aspetto, telefono(larghezza), mondo)
+  matriceMondo(stazione, aspetto, telefono(larghezza), mondo, zoom)
   proiezione.makePerspective(-tangente * aspetto, tangente * aspetto, tangente, -tangente, 1, 60)
   for (let i = 0; i < 4; i++) {
     // coordinate della camera reale (che guarda verso −z dall’alto z = 20)
@@ -144,28 +200,25 @@ export function proiettaSchermo(stazione: number, larghezza: number, altezza: nu
   return true
 }
 
-// Ingombro del monitor (tubo e cornice, senza case e tastiera) nello spazio del modello:
-// mesh «monik2» di Computer.glb, misurata con gltf-transform.
-const MONITOR = { min: new Vector3(-0.29, 0.184, -0.266), max: new Vector3(0.283, 0.771, 0.236) }
-const angoliMonitor = [0, 1, 2, 3, 4, 5, 6, 7].map((i) =>
-  new Vector3(
-    i & 1 ? MONITOR.max.x : MONITOR.min.x,
-    i & 2 ? MONITOR.max.y : MONITOR.min.y,
-    i & 4 ? MONITOR.max.z : MONITOR.min.z,
-  ).applyMatrix4(matriceComputer),
-)
-
 /** rettangolo del monitor in pixel della vista; `profondita` = z del suo punto più lontano nella scena della camera reale */
 export type Ingombro = { sinistra: number; destra: number; alto: number; basso: number; profondita: number }
 
 /** proietta il monitor come proiettaSchermo proietta il vetro; false se una parte è dietro la camera */
 export function proiettaMonitor(stazione: number, larghezza: number, altezza: number, out: Ingombro) {
+  return proiettaAngoli(angoliMonitor, stazione, larghezza, altezza, out)
+}
+/** rettangolo del mouse 3d in pixel della vista: zona da toccare per accendere il computer */
+export function proiettaMouse(stazione: number, larghezza: number, altezza: number, out: Ingombro) {
+  return proiettaAngoli(angoliMouse, stazione, larghezza, altezza, out)
+}
+
+function proiettaAngoli(angoli: Vector3[], stazione: number, larghezza: number, altezza: number, out: Ingombro) {
   const aspetto = larghezza / altezza
   matriceMondo(stazione, aspetto, telefono(larghezza), mondo)
   proiezione.makePerspective(-tangente * aspetto, tangente * aspetto, tangente, -tangente, 1, 60)
   out.sinistra = out.alto = out.profondita = Infinity
   out.destra = out.basso = -Infinity
-  for (const angolo of angoliMonitor) {
+  for (const angolo of angoli) {
     p.copy(angolo).applyMatrix4(mondo)
     out.profondita = Math.min(out.profondita, p.z)
     p.sub(CAMERA)
@@ -188,7 +241,8 @@ misureScena.cameraZ = CAMERA.z
 /** misura in pixel del vetro durante la sosta: diventa la risoluzione dell’interfaccia */
 export function misuraSosta(larghezza: number, altezza: number) {
   const q: number[] = []
-  if (!proiettaSchermo(1, larghezza, altezza, q)) return { larghezza: 640, altezza: 540 }
+  // sempre a computer acceso, davanti allo schermo
+  if (!proiettaSchermo(1, larghezza, altezza, q, 1)) return { larghezza: 640, altezza: 540 }
   return {
     larghezza: Math.round(Math.hypot(q[2] - q[0], q[3] - q[1])),
     altezza: Math.round(Math.hypot(q[6] - q[0], q[7] - q[1])),

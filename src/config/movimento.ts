@@ -46,15 +46,31 @@ export const movimento = {
     avvicinamento: 100,
     // scroll con la camera ferma davanti allo schermo acceso: qui il computer si usa (vh)
     sosta: 120,
-    // a che punto dell’avvicinamento il computer si accende, e sotto quale si spegne tornando su
-    accendiDa: 0.9,
-    spegniSotto: 0.6,
-    // durata dell’avvio (s): prima volta e accensioni successive
-    avvio: 2.2,
+    // sequenza di avvio dopo il clic (s): accordo e tubo che si apre, «hello» scritto, il sistema che si bugga
+    // con il volto che affiora, poi la scrivania. Saltabile con un clic o un tasto. `avvioBreve` resta per
+    // le riaccensioni (oggi, una volta acceso, il computer non si spegne più)
+    avvio: { apertura: 0.6, hello: 1.9, pausa: 0.5, bug: 1.1, trama: 0.45 },
     avvioBreve: 0.7,
-    // quanto spazio occupa lo schermo nella sosta su desktop/tablet (frazione della vista)
+    // dopo l’accordo, il disco che gira
+    disco: 0.8,
+    // quanto spazio occupa lo schermo nella sosta su desktop/tablet (frazione della vista), a computer acceso
     altezzaSchermo: 0.5,
     larghezzaSchermo: 0.6,
+    // inquadratura larga a computer spento: monitor, tastiera e mouse, vista un po’ dall’alto.
+    // Al clic la camera entra verso lo schermo (percorso.computer.zoom 0 → 1, animato da GSAP, non dallo scroll)
+    larga: {
+      // gradi sopra l’orizzonte e di lato (positivo = da destra)
+      elevazione: 17,
+      lato: 0,
+      // frazione della vista occupata dall’insieme (desktop/tablet, telefono)
+      riempie: { larghezza: 0.9, altezza: 0.82 },
+      riempieTelefono: { larghezza: 1.05, altezza: 0.6 },
+      // spazio sopra il monitor per il volto che sporge (unità del modello, il monitor è alto ≈ 0,59)
+      testa: 0.22,
+    },
+    zoom: { durata: 2.2, ease: 'power2.inOut' },
+    // impulso del mouse 3d che invita ad accendere (s) e intensità massima del bagliore
+    invito: { periodo: 1.6, intensita: 0.32 },
     // il volto dietro il monitor (vedi docs/computer.md)
     volto: {
       // larghezza del volto rispetto al monitor visto dalla camera: sbucando è più grande del monitor

@@ -218,6 +218,19 @@ html.cursore-personalizzato .mac-schermo * {
 @keyframes mac-compare {
   to { opacity: 1; }
 }
+/* avvio dopo il clic (Avvio.tsx): canvas a bassa risoluzione ingrandito a pixel netti, solo i due fosfori.
+   «hello» scritto a mano, poi il sistema che si bugga con il volto che affiora, poi la trama */
+.mac-avvio-completo {
+  overflow: hidden;
+  background: var(--mac-bianco);
+}
+.mac-avvio-tela {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
 
 /* finder */
 .mac-finder {

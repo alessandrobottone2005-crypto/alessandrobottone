@@ -1,16 +1,17 @@
 // L’interfaccia del computer è DOM vero, posato sul vetro 3d con una matrix3d calcolata dai suoi quattro angoli.
-// Resta nitida, cliccabile e leggibile da tastiera e screen reader. Su telefono, arrivati davanti
-// allo schermo, la camera supera la cornice e l’interfaccia occupa tutta la vista.
+// Resta nitida, cliccabile e leggibile da tastiera e screen reader. Su telefono, a computer acceso e camera
+// entrata verso lo schermo, la camera supera la cornice e l’interfaccia occupa tutta la vista.
+// Spento, sopra monitor e mouse ci sono le zone per accenderlo (Accensione.tsx).
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { movimento } from '@/config/movimento'
 import { sito } from '@/config/sito'
 import { gsap } from '@/lib/gsap'
 import { percorso } from '@/components/volto/percorso'
 import { ricalcolaCursore } from '@/components/cursore/ricalcola'
 import { misuraSosta, omografia, proiettaSchermo, telefono } from './inquadratura'
-import { aggancio, fineAvvio, giaAvviato, useFaseComputer } from './stato'
+import { aggancio, useFaseComputer } from './stato'
 import { Finder } from './Finder'
-import { MacFelice } from './icone'
+import { Accensione } from './Accensione'
+import { Avvio } from './Avvio'
 import './computer.css'
 
 const liscio = (t: number) => {
@@ -68,13 +69,15 @@ export default function Interfaccia({ modo }: { modo: 'percorso' | 'ridotto' }) 
     const w = box?.width ?? document.documentElement.clientWidth
     const h = box?.height ?? innerHeight
     const s = modo === 'ridotto' ? 1 : percorso.stazione
+    const zoom = modo === 'ridotto' ? 1 : percorso.computer.zoom
     const m = misuraRef.current
     const q = angoli.current
-    const vicino = s > 0.5 && s < 1.8 && proiettaSchermo(s, w, h, q)
+    const vicino = s > 0.5 && s < 1.8 && proiettaSchermo(s, w, h, q, zoom)
     let opacita = vicino ? 1 : 0
     if (vicino && m.telefono) {
-      // dentro lo schermo: dal vetro alla vista intera, solo nell’ultimo tratto
-      const t = s <= 1 ? liscio((s - 0.82) / 0.18) : 1 - liscio((s - 1) / 0.2)
+      // dentro lo schermo: dal vetro alla vista intera, solo nell’ultimo tratto della discesa
+      // e dell’entrata dopo l’accensione (zoom)
+      const t = (s <= 1 ? liscio((s - 0.82) / 0.18) : 1 - liscio((s - 1) / 0.2)) * liscio((zoom - 0.55) / 0.45)
       const pieno = [0, 0, w, 0, w, h, 0, h]
       for (let i = 0; i < 8; i++) q[i] += (pieno[i] - q[i]) * t
       opacita = t
@@ -85,7 +88,7 @@ export default function Interfaccia({ modo }: { modo: 'percorso' | 'ridotto' }) 
     el.style.visibility = visibilita
     el.style.opacity = String(opacita)
     if (vicino) el.style.transform = omografia(m.larghezza, m.altezza, q)
-    const ora = modo === 'ridotto' || (s > 0.995 && s < 1.02)
+    const ora = modo === 'ridotto' || (s > 0.995 && s < 1.02 && zoom > 0.999)
     setAttiva((a) => (a === ora ? a : ora))
   }, [modo])
 
@@ -120,37 +123,26 @@ export default function Interfaccia({ modo }: { modo: 'percorso' | 'ridotto' }) 
   }, [])
 
   return (
-    <div
-      ref={radice}
-      data-mac
-      data-fase={fase}
-      data-telefono={misura.telefono || undefined}
-      role="region"
-      aria-label={sito.computer.schermo}
-      inert={!attiva || fase !== 'acceso'}
-      className={`mac-schermo ${modo === 'ridotto' ? 'absolute' : 'fixed'}`}
-      style={{ width: misura.larghezza, height: misura.altezza, visibility: 'hidden' }}
-    >
-      <div className="mac-vetro">
-        {finderMontato && <Finder larghezza={misura.larghezza} altezza={misura.altezza} telefono={misura.telefono} scala={scala} />}
-        {fase === 'avvio' && <Avvio />}
+    <>
+      <div
+        ref={radice}
+        data-mac
+        data-fase={fase}
+        data-telefono={misura.telefono || undefined}
+        role="region"
+        aria-label={sito.computer.schermo}
+        inert={!attiva || fase !== 'acceso'}
+        className={`mac-schermo ${modo === 'ridotto' ? 'absolute' : 'fixed'}`}
+        style={{ width: misura.larghezza, height: misura.altezza, visibility: 'hidden' }}
+      >
+        <div className="mac-vetro">
+          {finderMontato && <Finder larghezza={misura.larghezza} altezza={misura.altezza} telefono={misura.telefono} scala={scala} />}
+          {fase === 'avvio' && <Avvio />}
+        </div>
+        <div aria-hidden="true" className="mac-crt" />
+        <div aria-hidden="true" className="mac-banda" />
       </div>
-      <div aria-hidden="true" className="mac-crt" />
-      <div aria-hidden="true" className="mac-banda" />
-    </div>
-  )
-}
-
-/** trama grigia, poi il volto sul piccolo computer, poi la scrivania */
-function Avvio() {
-  const breve = giaAvviato()
-  useEffect(() => {
-    const id = window.setTimeout(fineAvvio, (breve ? movimento.computer.avvioBreve : movimento.computer.avvio) * 1000)
-    return () => clearTimeout(id)
-  }, [breve])
-  return (
-    <div className="mac-avvio" data-breve={breve || undefined} role="status" aria-label={sito.computer.avvio}>
-      <MacFelice />
-    </div>
+      {modo === 'percorso' && <Accensione />}
+    </>
   )
 }

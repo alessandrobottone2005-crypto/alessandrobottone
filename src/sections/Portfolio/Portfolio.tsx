@@ -1,5 +1,6 @@
-// Portfolio: dopo l’header la camera scende verso il computer a terra, fino allo schermo, che si accende e si usa.
-// Nessun pin: lo scroll avanza sempre; durante la sosta la camera resta ferma davanti allo schermo.
+// Portfolio: dopo l’header la camera scende verso il computer a terra e si ferma su monitor, tastiera e mouse.
+// Un clic (o tocco, o Invio) lo accende: la camera entra verso lo schermo, che si usa. Una volta acceso resta acceso.
+// Nessun pin: lo scroll avanza sempre; durante la sosta la camera resta ferma sull’inquadratura corrente.
 // Con movimento ridotto: scena ferma sul computer già acceso.
 import { lazy, Suspense, useEffect, useRef } from 'react'
 import { media, movimento } from '@/config/movimento'
@@ -8,7 +9,7 @@ import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { useMediaQuery } from '@/lib/useMediaQuery'
 import { latiDisponibili, percorso, type Lato } from '@/components/volto/percorso'
 import { useVolto, type Azione } from '@/components/volto/VoltoContext'
-import { accendi, spegni } from '@/components/computer/stato'
+import { accendi, leggiFase, useFaseComputer, type Fase } from '@/components/computer/stato'
 import { useAvvio } from '@/components/preloader/AvvioContext'
 import { getLenis } from '@/lib/scroll'
 
@@ -49,20 +50,13 @@ export function Portfolio() {
 function ComputerNelPercorso() {
   const palco = useRef<HTMLDivElement>(null)
   useNascondino()
+  useZoom()
 
   useGSAP(
     () => {
       const stato = percorso.computer
       const vh = () => innerHeight / 100
       gsap.set(stato, { vicino: 0 })
-      // acceso/spento dipende sempre dalla posa reale: ScrollTrigger, nei refresh (resize, ricarica a metà
-      // pagina, link diretto), porta la timeline alla posizione sopprimendo gli onUpdate. Per questo il
-      // controllo gira anche sul ticker (costa un confronto; accendi/spegni non fanno nulla se lo stato è già quello)
-      const controlla = () => {
-        if (stato.vicino >= C.accendiDa) accendi()
-        else if (stato.vicino < C.spegniSotto) spegni()
-      }
-      gsap.ticker.add(controlla)
       const tl = gsap.timeline({
         defaults: { ease: 'none' },
         scrollTrigger: {
@@ -75,8 +69,8 @@ function ComputerNelPercorso() {
           invalidateOnRefresh: true,
         },
       })
-      tl.to(stato, { vicino: 1, duration: C.avvicinamento, onUpdate: controlla }, 0)
-      // la sosta: la camera resta ferma davanti allo schermo
+      tl.to(stato, { vicino: 1, duration: C.avvicinamento }, 0)
+      // la sosta: la camera resta ferma davanti al computer (larga se spento, vicina se acceso)
       tl.to({}, { duration: C.sosta }, C.avvicinamento)
 
       // resize e rotazione: le altezze delle sezioni cambiano ma lo scroll resta allo stesso pixel. Chi stava
@@ -139,8 +133,6 @@ function ComputerNelPercorso() {
         removeEventListener('resize', alResize)
         ScrollTrigger.removeEventListener('refreshInit', primaDelRefresh)
         ScrollTrigger.removeEventListener('refresh', dopoIlRefresh)
-        gsap.ticker.remove(controlla)
-        spegni()
         gsap.set(stato, { vicino: 0 })
       }
     },
@@ -160,6 +152,30 @@ function ComputerNelPercorso() {
 }
 
 /**
+ * Zoom dell’accensione: con il clic la camera entra dall’inquadratura larga a quella davanti allo schermo,
+ * con un movimento suo (GSAP su percorso.computer.zoom), non legato allo scroll. Acceso senza avvio
+ * (link diretto, ritorno dal movimento ridotto): subito vicina. Il computer non si spegne più, lo zoom resta.
+ */
+let tweenZoom: gsap.core.Tween | null = null
+const zoomInCorso = () => Boolean(tweenZoom?.isActive())
+function useZoom() {
+  const fase = useFaseComputer()
+  const prima = useRef<Fase>(leggiFase())
+  useEffect(() => {
+    const c = percorso.computer
+    const era = prima.current
+    prima.current = fase
+    if (fase === 'spento') {
+      tweenZoom?.kill()
+      c.zoom = 0
+    } else if (fase === 'avvio' && era === 'spento') {
+      tweenZoom?.kill()
+      tweenZoom = gsap.to(c, { zoom: 1, duration: C.zoom.durata, ease: C.zoom.ease })
+    } else if (fase === 'acceso' && !zoomInCorso()) c.zoom = 1
+  }, [fase])
+}
+
+/**
  * Nascondino del volto dietro il monitor: esce da un lato, resta qualche secondo, rientra e cambia lato.
  * GSAP anima percorso.computer.sbircia, la scena lo legge per fotogramma (leggiPosa); fuori dalla sosta non si vede.
  * Aprendo o chiudendo un progetto, se è nascosto sbuca subito e ripete l’espressione quando è fuori.
@@ -175,8 +191,9 @@ function useNascondino() {
     const S = movimento.computer.sbircia
     const sb = percorso.computer.sbircia
     const caso = (min: number, max: number) => min + Math.random() * (max - min)
-    // fermi davanti allo schermo acceso (non durante la discesa né verso la biografia)
-    const davanti = () => percorso.computer.vicino >= 0.999 && percorso.stazione < 1.001
+    // fermi davanti al computer (non durante la discesa, lo zoom o verso la biografia)
+    const davanti = () =>
+      percorso.computer.vicino >= 0.999 && percorso.stazione < 1.001 && !zoomInCorso()
     let attesa: gsap.core.Tween | null = null
     let giro: gsap.core.Timeline | null = null
     let ultimo: Lato | null = null
@@ -216,10 +233,8 @@ function useNascondino() {
 }
 
 function ComputerFermo() {
-  useEffect(() => {
-    accendi(true)
-    return spegni
-  }, [])
+  // già acceso, senza avvio; resta acceso anche tornando al movimento normale
+  useEffect(() => accendi(true), [])
   return (
     <div className="relative h-svh min-h-[32rem] overflow-hidden">
       <Suspense fallback={null}>

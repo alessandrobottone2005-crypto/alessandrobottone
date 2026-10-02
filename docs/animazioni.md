@@ -84,7 +84,7 @@ altre regole:
 | `lenis` | `lerp` 0,1 (più basso = più morbido e lento) |
 | `preloader` | `minimo` 1,6s · `massimo` 6s · `breve` 0,8s (seconda visita nella stessa sessione) |
 | `header` | `pinDesktop` 400 · `pinMobile` 300 (vh) · `inizioNomeCompatto` 92 (% dell’header in cui il nome inizia a raccogliersi) |
-| `computer` | `avvicinamento` 100vh · `sosta` 120vh · `accendiDa` 0,9 · `spegniSotto` 0,6 · `avvio` 2,2s · `avvioBreve` 0,7s · `altezzaSchermo` 0,5 · `larghezzaSchermo` 0,6 |
+| `computer` | `avvicinamento` 100vh · `sosta` 120vh · `avvio` (apertura 0,6 · hello 1,9 · pausa 0,5 · bug 1,1 · trama 0,45s) · `avvioBreve` 0,7s · `disco` 0,8s · `altezzaSchermo` 0,5 · `larghezzaSchermo` 0,6 · `larga` (inquadratura da spento) · `zoom` 2,2s · `invito` 1,6s ([computer](computer.md)) |
 | `computer.volto` | volto dietro il monitor: `fattore` 1,25 · `fattoreNascosto` 0,86 · `distacco` 0,5 u · `versoDa` 0,3 · `versoA` 0,55 · `nascondiDa` 0,85 · `margine` 0,03 ([computer](computer.md#il-volto-dietro-il-computer)) |
 | `computer.sbircia` | nascondino: `uscita` 0,9s · `rientro` 0,7s · `restaMin/Max` 4–8s · `nascostoMin/Max` 1,4–3s · `rollio` 9° · `altezza` 0,38 · `spostamento` 0,16 |
 | `chiSono` | `pin` 150 · `versoContatti` 100 (vh) · `scambio` 14 (scroll in cui logo e avatar si scambiano) |

@@ -1,6 +1,6 @@
 // cursore personalizzato, solo con il mouse (claude.md §7).
 // gsap muove il contenitore (posizione con inerzia); motion anima la forma dentro (stati).
-// per cambiare forma su un elemento: data-cursore="apri" (o sfoglia, ruota, play, pausa, chiudi, tieni premuto).
+// per cambiare forma su un elemento: data-cursore="apri" (o sfoglia, ruota, play, pausa, chiudi, tieni premuto, accendi).
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router'

@@ -1,5 +1,7 @@
 // Stato condiviso del computer: accensione (letta da React) e aggancio dell’interfaccia allo schermo 3d.
+// Il computer si accende con un clic (o tocco, o Invio) sul monitor o sul mouse 3d, e una volta acceso resta acceso.
 import { useSyncExternalStore } from 'react'
+import { percorso } from '@/components/volto/percorso'
 
 export type Fase = 'spento' | 'avvio' | 'acceso'
 
@@ -22,9 +24,12 @@ export function fineAvvio() {
   avviato = true
   if (fase === 'avvio') imposta('acceso')
 }
+/** non più usato dal percorso (il computer resta acceso anche risalendo): resta per chi deve ripartire da zero */
 export function spegni() {
   imposta('spento')
 }
+/** il computer aspetta il clic: spento, con la camera ferma davanti a lui (sosta, non verso la biografia) */
+export const accendibile = () => fase === 'spento' && percorso.computer.vicino >= 0.999 && percorso.stazione < 1.001
 export const giaAvviato = () => avviato
 export const leggiFase = () => fase
 

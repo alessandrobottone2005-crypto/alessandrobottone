@@ -1,6 +1,6 @@
 # computer
 
-Il portfolio è un computer beige appoggiato sul pavimento della sala di cemento, nel fascio di luce della fessura. Dopo l’header la camera abbassa lo sguardo, scende fino allo schermo e il computer si accende. Sullo schermo c’è un’interfaccia che riprende il Finder del Macintosh 1984: scrivania con una cartella per disciplina (illustrazione, branding, 3d; web design torna con `webDesignAttivo` in `src/config/discipline.ts`) e, dentro, un documento per progetto.
+Il portfolio è un computer beige appoggiato sul pavimento della sala di cemento, nel fascio di luce della fessura. Dopo l’header la camera abbassa lo sguardo e scende fino a inquadrare monitor, tastiera e mouse. Il computer è spento: si accende con un clic (o tocco) sul monitor o sul mouse 3d, o con Invio su un pulsante invisibile sopra il monitor; parte la sequenza di avvio e la camera entra verso lo schermo. Una volta acceso resta acceso. Sullo schermo c’è un’interfaccia che riprende il Finder del Macintosh 1984: scrivania con una cartella per disciplina (illustrazione, branding, 3d; web design torna con `webDesignAttivo` in `src/config/discipline.ts`) e, dentro, un documento per progetto.
 
 Regole concordate il 1 ottobre 2026: dentro lo schermo bianco e nero e carattere ChicagoFLF (eccezione alle regole 1 e 2 di `CLAUDE.md`, valida solo lì); copertine e immagini dei progetti sempre a colori; testi in minuscolo come nel resto del sito. Dal 2 ottobre 2026 bianco e nero non sono più puri: sono i fosfori di un tubo vero (`--mac-bianco` #e7e1d1, `--mac-nero` #161614).
 
@@ -20,35 +20,51 @@ Nella scena 3d il piano di luce davanti al vetro ha il colore dei fosfori ed è 
 
 | file | ruolo |
 |---|---|
-| `src/sections/Portfolio/Portfolio.tsx` | spazio di scroll (avvicinamento + sosta), ScrollTrigger `portfolio-computer`, accensione e spegnimento; versione ferma con movimento ridotto |
-| `src/components/computer/inquadratura.ts` | posizione del computer, rettangolo del vetro, percorso della camera virtuale, proiezione degli angoli e `matrix3d` |
-| `src/components/computer/stato.ts` | fase `spento → avvio → acceso` e aggancio tra scena 3d e interfaccia |
-| `src/components/computer/Interfaccia.tsx` | DOM posato sul vetro, avvio con il volto pixel, effetto tubo catodico |
+| `src/sections/Portfolio/Portfolio.tsx` | spazio di scroll (avvicinamento + sosta), ScrollTrigger `portfolio-computer`, zoom dell’accensione (`useZoom`), nascondino; versione ferma con movimento ridotto |
+| `src/components/computer/inquadratura.ts` | posizione del computer, rettangolo del vetro, ingombri di monitor, tastiera e mouse, inquadratura larga e vicina, percorso della camera virtuale, proiezioni e `matrix3d` |
+| `src/components/computer/stato.ts` | fase `spento → avvio → acceso`, `accendibile()` e aggancio tra scena 3d e interfaccia |
+| `src/components/computer/Accensione.tsx` | zone DOM sopra monitor e mouse per accendere, pulsante da tastiera, focus nello schermo dopo l’avvio |
+| `src/components/computer/Avvio.tsx` | sequenza di avvio: «hello» in corsivo pixel, il sistema che si bugga con il volto che affiora, trama |
+| `src/components/computer/Interfaccia.tsx` | DOM posato sul vetro, effetto tubo catodico |
 | `src/components/computer/Finder.tsx` | barra dei menu, scrivania, cartelle, documenti, finestra del progetto legata all’indirizzo |
 | `Finestra.tsx`, `BarraMenu.tsx`, `icone.tsx`, `voltoPixel.ts`, `computer.css` | finestre, menu, icone 1-bit e stile |
-| `src/components/volto/ComputerNellaScena.tsx`, `modelloComputer.ts`, `Mondo.tsx`, `ScenaRidotta.tsx` | modello 3d, bagliore del vetro, movimento del mondo, scena ferma |
+| `src/components/volto/ComputerNellaScena.tsx`, `modelloComputer.ts`, `Mondo.tsx`, `ScenaRidotta.tsx` | modello 3d, bagliore del vetro, impulso del mouse, movimento del mondo, scena ferma |
 
 ## come si muove
 
-La camera reale non si sposta mai (z ≈ 8,7, campo 40°): il volto è misurato in pixel e non cambia scala; sta sul piano z = 0, tranne dietro il computer dove ha una sua profondità. A muoversi è il «mondo» (`Mondo.tsx`): edificio e computer ricevono la trasformazione inversa di una camera virtuale che percorre l’edificio. `percorso.stazione` va da 0 (header) a 1 (davanti allo schermo), 2 (biografia), 3 (contatti).
+La camera reale non si sposta mai (z ≈ 8,7, campo 40°): il volto è misurato in pixel e non cambia scala; sta sul piano z = 0, tranne dietro il computer dove ha una sua profondità. A muoversi è il «mondo» (`Mondo.tsx`): edificio e computer ricevono la trasformazione inversa di una camera virtuale che percorre l’edificio. `percorso.stazione` va da 0 (header) a 1 (fermi davanti al computer), 2 (biografia), 3 (contatti). Alla stazione 1 l’inquadratura dipende da `percorso.computer.zoom`: 0 = larga (computer spento), 1 = davanti allo schermo (acceso).
 
-- avvicinamento, 100vh (`movimento.computer.avvicinamento`): la camera scivola dalla stazione header a quella del computer, abbassa lo sguardo sul computer a terra (≈ 40% del tratto) e poi scende fino allo schermo. Il volto va dietro il computer (sezione seguente).
-- accensione al 90% dell’avvicinamento (`accendiDa`); tornando sotto il 60% (`spegniSotto`) lo schermo si richiude in una riga. Il primo avvio dura 2,2s (trama grigia, poi il volto pixelato sul piccolo computer), i successivi 0,7s.
-- acceso/spento si ricava sempre da `percorso.computer.vicino`, controllato a ogni tick di GSAP: ScrollTrigger, nei refresh (resize, ricarica, link diretto), sposta la timeline senza eventi `onUpdate`, quindi non bastano i callback del tween.
+- avvicinamento, 100vh (`movimento.computer.avvicinamento`): la camera scivola dalla stazione header a quella del computer, abbassa lo sguardo sul computer a terra (≈ 40% del tratto) e poi scende fino all’inquadratura corrente. Il volto va dietro il computer (sezione seguente).
+- inquadratura larga (`movimento.computer.larga`): vista un po’ dall’alto (`elevazione` 17°) su monitor, tastiera e mouse, con spazio sopra il monitor per il volto (`testa`). La distanza è la minima che fa stare tutti gli angoli dell’insieme nella frazione di vista `riempie` (telefono: `riempieTelefono`), calcolata in `inquadratura.ts` (`distanzaLarga`).
+- accensione: solo fermi davanti al computer spento (`accendibile()` in `stato.ts`), con un clic o un tocco sul monitor o sul mouse 3d, o Invio/Spazio sul pulsante «accendi il computer». Il Canvas non riceve eventi, quindi niente raycast: `Accensione.tsx` posa due elementi DOM fissi sopra le proiezioni di monitor e mouse (`proiettaMonitor`, `proiettaMouse`, almeno 48px), aggiornati sul ticker di GSAP. Il cursore del sito mostra «accendi»; il mouse 3d pulsa appena (`movimento.computer.invito`): un guscio additivo bianco costruito dai triangoli della mesh «keyboard2» che cadono nell’ingombro `MOUSE` (tastiera e mouse sono una sola mesh).
+- zoom: all’accensione GSAP porta `percorso.computer.zoom` da 0 a 1 (`movimento.computer.zoom`, 2,2s), indipendente dallo scroll: la camera entra fino all’inquadratura di sempre (desktop/tablet: cornice visibile; telefono: interfaccia a tutta vista). Lo scroll resta libero e reversibile.
+- una volta acceso resta acceso: risalendo verso l’header e tornando giù lo schermo è già acceso e l’inquadratura resta vicina. `spegni()` esiste ancora in `stato.ts` ma il percorso non la usa.
+- link diretto `/progetti/:slug` e movimento ridotto: acceso subito (`accendi(true)`), senza sequenza, inquadratura vicina.
 - resize e rotazione: chi sta nella sosta resta nello stesso punto della sosta (anche con un progetto aperto); la posizione si legge al primo evento `resize`, prima che l’header rifaccia il pin. Cambiando la preferenza di movimento a sito aperto si resta nella stessa sezione (`src/lib/scroll.ts`); nel portfolio si torna a metà della sosta.
 - quando lo schermo compare o diventa interattivo sotto un mouse fermo, l’interfaccia avvisa il cursore (`components/cursore/ricalcola.ts`), che lascia il posto alla freccia pixel senza aspettare un movimento.
-- sosta, 120vh (`sosta`): camera ferma, schermo acceso, interfaccia utilizzabile. Nessun pin: lo scroll continua sempre.
+- sosta, 120vh (`sosta`): camera ferma sull’inquadratura corrente (larga se spento, vicina se acceso); interfaccia utilizzabile solo da accesa e a zoom concluso. Nessun pin: lo scroll continua sempre.
 - uscita: con l’ingresso della biografia la camera si rialza e si gira verso la parete della biografia; l’interfaccia segue il vetro finché è visibile.
 
-Su desktop e tablet lo schermo occupa circa metà dell’altezza (`altezzaSchermo` 0,5, `larghezzaSchermo` 0,6) e la cornice resta visibile. Su telefono (< 768px) la camera supera la cornice e nell’ultimo tratto l’interfaccia passa dal vetro a tutta la vista, con una fascia nera in alto per il nome fisso.
+A computer acceso, su desktop e tablet lo schermo occupa circa metà dell’altezza (`altezzaSchermo` 0,5, `larghezzaSchermo` 0,6) e la cornice resta visibile. Su telefono (< 768px) la camera supera la cornice e nell’ultima parte dello zoom (e della discesa, se già acceso) l’interfaccia passa dal vetro a tutta la vista, con una fascia nera in alto per il nome fisso.
+
+## sequenza di avvio
+
+`Avvio.tsx`, durante la fase `avvio` (durate in `movimento.computer.avvio`, totale ≈ 4,5s), mentre la camera entra:
+
+1. accordo di avvio (`audio.suona('accensione')`, dopo `disco` 0,8s il disco), battito del volto; il tubo si apre da una riga e i fosfori si scaldano a scatti (0,6s);
+2. «hello» in corsivo legato che si scrive tratto per tratto (1,9s), poi resta (0,5s). È un path nostro disegnato a mano (`TRATTO_HELLO`), non la scritta storica né il suo carattere;
+3. il sistema si bugga (1,1s): bande di righe che scivolano, blocchi invertiti, lo schermo che salta in verticale e, per un istante, il volto di alessandro in pixel (`voltoPixel.ts`) che affiora invertito nel disturbo; un `glitch.emetti` sulla camera;
+4. la trama grigia (0,45s), poi la scrivania del Finder.
+
+Tutto su un canvas a bassa risoluzione (un pixel del sistema ≈ 3–4px), soglia a due colori dei fosfori e ingrandimento `pixelated`. Un clic o Invio/Spazio/Esc salta alla scrivania. Se l’accensione è arrivata da tastiera, a scrivania pronta il focus va sul primo controllo dello schermo.
 
 ## il volto dietro il computer
 
 `leggiPosa` (`src/components/volto/percorso.ts`) proietta l’ingombro del monitor (`MONITOR` e `proiettaMonitor` in `inquadratura.ts`, mesh «monik2» di `Computer.glb`) e posa il volto rispetto a quel rettangolo. Oltre a posizione e larghezza in pixel la posa ha una profondità `z`: il volto sta `distacco` unità dietro il punto più lontano del monitor e `Volto3D.tsx` converte i pixel alla sua profondità. L’occlusione è quella vera del depth buffer; l’interfaccia DOM resta sopra il vetro. Le proporzioni del volto (lenti, pupille) vengono da `geometria.ts`. `inquadratura.ts` registra la proiezione in `misureScena` quando arriva il codice 3d, così three.js resta fuori dal bundle iniziale.
 
-- discesa (`movimento.computer.volto`): fra `versoDa` e `versoA` dell’avvicinamento il volto scivola dal centro dietro il monitor, largo `fattore` (1,25) volte il monitor visto dalla camera, con lenti e occhi sopra il bordo. Da `nascondiDa` (0,85) si abbassa e arretra finché, visto da qui, è largo `fattoreNascosto` (0,86) volte il monitor: tutto coperto. Tutto scrubbato e reversibile.
-- nascondino (`movimento.computer.sbircia`, `useNascondino` in `Portfolio.tsx`): solo fermi davanti allo schermo, GSAP anima `percorso.computer.sbircia` {lato, uscita}. Il volto esce (0,9s), resta 4–8s, rientra (0,7s), aspetta 1,4–3s e cambia lato; mai lo stesso due volte di fila. I lati dipendono dallo spazio (`latiDisponibili`): un lato vale se si vedono gli occhi interi. Su desktop e tablet orizzontale c’è spazio solo ai lati (destra/sinistra, lente intera e testa inclinata di 9°); su tablet verticale sopra, e destra/sinistra diventano «sopra, spostato». Su telefono nessun nascondino: l’interfaccia copre tutto. Mentre dorme non sbuca.
-- reazioni: aprendo una cartella battito; aprendo un progetto (anche con link diretto) sorriso, con gli occhi che si stringono come nel logo 2d; chiudendolo occhiolino, con l’occhio che si vede. Se il volto è nascosto sbuca subito e ripete l’espressione quando è fuori. Lo sguardo segue il cursore anche sopra l’interfaccia; un clic sull’interfaccia non fa l’occhiolino (`LogoContinuo.tsx` ignora `[data-mac]`).
+- discesa (`movimento.computer.volto`): fra `versoDa` e `versoA` dell’avvicinamento il volto scivola dal centro dietro il monitor, largo `fattore` (1,25) volte il monitor visto dalla camera, con lenti e occhi sopra il bordo. Nell’inquadratura larga (spento) resta così, sporgente sopra il monitor. Da `nascondiDa` (0,85) si abbassa e arretra finché, visto da qui, è largo `fattoreNascosto` (0,86) volte il monitor: tutto coperto; questo nascondersi è moltiplicato per lo zoom, quindi avviene mentre la camera entra verso lo schermo acceso. Tutto scrubbato e reversibile.
+- nascondino (`movimento.computer.sbircia`, `useNascondino` in `Portfolio.tsx`): solo fermi davanti al computer (con entrambe le inquadrature, non durante lo zoom), GSAP anima `percorso.computer.sbircia` {lato, uscita}. Il volto esce (0,9s), resta 4–8s, rientra (0,7s), aspetta 1,4–3s e cambia lato; mai lo stesso due volte di fila. I lati dipendono dallo spazio (`latiDisponibili`): un lato vale se si vedono gli occhi interi. Su desktop e tablet orizzontale c’è spazio solo ai lati (destra/sinistra, lente intera e testa inclinata di 9°); su tablet verticale sopra, e destra/sinistra diventano «sopra, spostato». Su telefono nessun nascondino: l’interfaccia copre tutto. Mentre dorme non sbuca.
+- reazioni: all’accensione battito; aprendo una cartella battito; aprendo un progetto (anche con link diretto) sorriso, con gli occhi che si stringono come nel logo 2d; chiudendolo occhiolino, con l’occhio che si vede. Se il volto è nascosto sbuca subito e ripete l’espressione quando è fuori. Lo sguardo segue il cursore anche sopra l’interfaccia; un clic sull’interfaccia non fa l’occhiolino (`LogoContinuo.tsx` ignora `[data-mac]`).
 - uscita verso la biografia: parte dalla posa in cui si trova (anche sbucato) e torna al piano z = 0.
 
 ## interfaccia posata sul vetro
@@ -69,11 +85,11 @@ Il rettangolo del vetro (`VETRO` in `inquadratura.ts`) è misurato in Blender co
 
 ## accessibilità
 
-L’interfaccia è una regione etichettata; resta `inert` finché la camera non è ferma davanti allo schermo acceso. Icone e voci sono pulsanti, le tendine usano `role="menu"` con frecce, le finestre sono `role="dialog"` non modali etichettate dal titolo. Aperture e chiusure sono annunciate con `aria-live`. Sullo schermo il cursore del sito lascia il posto alla freccia pixel.
+L’interfaccia è una regione etichettata; resta `inert` finché la camera non è ferma davanti allo schermo acceso (zoom concluso). Da spento, il pulsante «accendi il computer» (invisibile, con il focus bianco visibile) sta sopra il monitor e si attiva con Invio o Spazio; la zona del mouse è solo per puntatore e tocco (`aria-hidden`, fuori dall’ordine di tabulazione). Durante l’avvio la regione `role="status"` annuncia l’accensione e il saluto. Icone e voci sono pulsanti, le tendine usano `role="menu"` con frecce, le finestre sono `role="dialog"` non modali etichettate dal titolo. Aperture e chiusure sono annunciate con `aria-live`. Sullo schermo il cursore del sito lascia il posto alla freccia pixel.
 
 ## movimento ridotto
 
-Il 3d si scarica comunque (scelta del 1 ottobre 2026), ma la scena è ferma: sezione alta uno schermo, inquadratura della sosta, computer già acceso senza avvio, niente sfarfallio del tubo né transizioni.
+Il 3d si scarica comunque (scelta del 1 ottobre 2026), ma la scena è ferma: sezione alta uno schermo, inquadratura vicina della sosta, computer già acceso senza clic né avvio, niente sfarfallio del tubo né transizioni. Tornando al movimento normale il computer resta acceso.
 
 ## crediti
 
@@ -84,6 +100,10 @@ Il 3d si scarica comunque (scelta del 1 ottobre 2026), ma la scena è ferma: sez
 Build TypeScript/Vite e lint superati; la build avvisa che i crediti del computer e della sala sono incompleti. Bundle iniziale ≈ 207 kB gzip: three.js, modello e interfaccia arrivano dopo il preloader. `computer.glb` 1,03 MB (originale 14,4 MB).
 
 Verifica nel server di sviluppo con Chrome headless a 1440×900, 820×1180 e 390×844 (viewport emulati, non telefoni reali; nessuna misura di fps): discesa con il computer visto dall’alto, accensione, sosta, cartelle per icona e per nome, finestra del progetto con indirizzo `/progetti/…`, menu e informazioni, Esc su tendina e finestre con ritorno del focus, spegnimento tornando su e riaccensione, uscita verso la biografia, tocco su telefono, link diretto su telefono, movimento ridotto (scena ferma, computer acceso e usabile), modello bloccato (interfaccia comunque usabile). Il volto ora sta di proposito dietro il monitor (sezione «il volto dietro il computer»).
+
+## verifica — 2 ottobre 2026 (accensione con clic)
+
+Lint e build superati. Server di sviluppo con Chrome headless a 1440×900 e 390×844 con tocco emulato (viewport emulati, nessuna misura di fps): discesa, sosta larga con monitor, tastiera e mouse, cursore «accendi», clic sul monitor (desktop), tocco sul mouse 3d (telefono), Invio sul pulsante con il focus portato nello schermo a fine avvio, «hello», bug con il volto che affiora, zoom fino al Finder, risalita e ritorno con il computer ancora acceso, link diretto `/progetti/lorenzo` (finestra aperta, inquadratura vicina) su desktop e telefono, movimento ridotto (scena ferma, acceso). Suoni e glitch della camera sono solo chiamati: li suonano e disegnano i loro moduli.
 
 ## i blocchi
 

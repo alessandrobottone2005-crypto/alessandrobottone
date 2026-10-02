@@ -64,6 +64,14 @@ export const sito = {
     aperta: (titolo: string) => `finestra aperta: ${titolo}`,
     chiusa: (titolo: string) => `finestra chiusa: ${titolo}`,
     avvio: 'accensione del computer',
+    // si accende con un clic sul monitor o sul mouse 3d (o Invio sul pulsante invisibile sopra il monitor)
+    accensione: {
+      pulsante: 'accendi il computer',
+      // parola del cursore del sito sopra monitor e mouse
+      cursore: 'accendi',
+      // il saluto scritto in corsivo pixel durante l’avvio (disegnato, qui per gli screen reader)
+      saluto: 'hello',
+    },
     copertina: (titolo: string) => `copertina di ${titolo}`,
     // crediti obbligatori del modello (cc by): autore e link vanno completati prima di pubblicare
     crediti: {

@@ -11,7 +11,9 @@ export const percorso = {
   header: { opacity: 0, rotazione: 0, scala: 1, inclinazione: 0 },
   // vicino: 0 = fine dell’header, 1 = camera ferma davanti allo schermo.
   // sbircia: nascondino nella sosta (uscita 0 = nascosto dietro il monitor, 1 = sbucato dal lato)
-  computer: { vicino: 0, sbircia: { lato: 'destra' as Lato, uscita: 0 } },
+  // zoom: 0 = inquadratura larga (monitor, tastiera e mouse, computer spento), 1 = vicina allo schermo acceso;
+  // lo anima GSAP all’accensione, non lo scroll
+  computer: { vicino: 0, zoom: 0, sbircia: { lato: 'destra' as Lato, uscita: 0 } },
   // ologramma: 0 = logo, 1 = avatar olografico al posto del logo nel chi sono
   biografia: { uscita: 0, ologramma: 0 },
   guarda: null as Punto | null,
@@ -109,7 +111,8 @@ export function latiDisponibili(): Lato[] {
 
 /**
  * Il volto dietro il monitor per la stazione `s` (0–1): durante la discesa sporge sopra il monitor,
- * arrivato davanti allo schermo si nasconde e gioca a nascondino. null se il monitor non è in vista.
+ * arrivato davanti allo schermo acceso si nasconde e gioca a nascondino. Nell’inquadratura larga
+ * (computer spento) resta sporgente come nella discesa. null se il monitor non è in vista.
  */
 function dietroIlMonitor(s: number, vicino: number, w: number, h: number): Punto3 | null {
   if (!proiettaMonitor(s, w, h, monitor)) return null
@@ -135,7 +138,9 @@ function dietroIlMonitor(s: number, vicino: number, w: number, h: number): Punto
     z: misureScena.cameraZ - (misureScena.cameraZ - dietro) * (V.fattore / V.fattoreNascosto),
     rollio: 0,
   }
-  const posa = misto(discesa, nascosto, morbido(limita((vicino - V.nascondiDa) / (1 - V.nascondiDa))))
+  // si nasconde solo avvicinandosi allo schermo acceso: da lontano (zoom 0) sporge sopra il monitor
+  const zoom = morbido(limita(percorso.computer.zoom))
+  const posa = misto(discesa, nascosto, morbido(limita((vicino - V.nascondiDa) / (1 - V.nascondiDa))) * zoom)
   // nascondino: solo fermi davanti allo schermo (su telefono l’interfaccia copre tutto)
   const sb = percorso.computer.sbircia
   const fuori = sb.uscita * limita((vicino - 0.97) / 0.03)

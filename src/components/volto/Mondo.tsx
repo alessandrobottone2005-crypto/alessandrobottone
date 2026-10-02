@@ -6,7 +6,7 @@ import { matriceMondo, telefono } from '@/components/computer/inquadratura'
 import { percorso } from './percorso'
 import { scenaImmersiva } from './scenaImmersiva'
 
-/** `stazione` fissa l’inquadratura (movimento ridotto); altrimenti segue lo scroll */
+/** `stazione` fissa l’inquadratura (movimento ridotto: davanti allo schermo acceso); altrimenti segue lo scroll e lo zoom */
 export function Mondo({ stazione, children }: { stazione?: number; children: ReactNode }) {
   const gruppo = useRef<Group>(null)
   const size = useThree((s) => s.size)
@@ -14,7 +14,7 @@ export function Mondo({ stazione, children }: { stazione?: number; children: Rea
   useFrame(() => {
     const g = gruppo.current
     if (!g) return
-    matriceMondo(stazione ?? percorso.stazione, size.width / size.height, telefono(size.width), g.matrix)
+    matriceMondo(stazione ?? percorso.stazione, size.width / size.height, telefono(size.width), g.matrix, stazione === undefined ? percorso.computer.zoom : 1)
     // subito: riflessi del pavimento e volume leggono la posizione di questo fotogramma, non del precedente
     g.updateMatrixWorld(true)
     scenaImmersiva.mondo.copy(g.matrixWorld)
