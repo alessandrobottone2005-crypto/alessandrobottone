@@ -2,13 +2,15 @@
 // bagliore e alone, striscia anamorfica, vignetta, AgX, colore da pellicola, aberrazione e grana (cinema.ts).
 // È anche il render finale del Canvas della home: un solo passaggio sulla scena, niente doppio disegno.
 import { Bloom, ChromaticAberration, EffectComposer, N8AO, Noise, ToneMapping, Vignette } from '@react-three/postprocessing'
-import { BlendFunction, BloomEffect, DepthOfFieldEffect, KernelSize, ToneMappingMode } from 'postprocessing'
+import { BlendFunction, BloomEffect, DepthOfFieldEffect, EffectPass, KernelSize, ToneMappingMode } from 'postprocessing'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useLayoutEffect, useMemo } from 'react'
-import { HalfFloatType, NoToneMapping, Vector2, Vector3, type ToneMapping as TipoToneMapping } from 'three'
+import { HalfFloatType, NoToneMapping, Vector2, Vector3, Vector4, type ToneMapping as TipoToneMapping } from 'three'
 import { centroSchermo } from '@/components/computer/inquadratura'
+import { glitch, zonaLogo } from '@/lib/glitch'
 import { cinema, effettoAttivo } from './cinema'
-import { EffettoColore, EffettoStriscia } from './effettiCinema'
+import { EffettoColore, EffettoGlitch, EffettoStriscia } from './effettiCinema'
+import { riscaldamento } from './riscaldamento'
 import { NebbiaComposizione, NebbiaPassaggio, useNebbia } from './NebbiaVolumetrica'
 import { percorso } from './percorso'
 import { qualita } from './qualita'
@@ -18,7 +20,7 @@ import { scenaImmersiva } from './scenaImmersiva'
 const effettiAttivi = new URLSearchParams(location.search).get('effetti') !== '0'
 // pulviscolo nel fascio della fessura; ?polvere=0.02 per provarne altri valori
 const POLVERE = Number(new URLSearchParams(location.search).get('polvere') ?? 0.008)
-// ?senza=ao,nebbia,bagliore,vignetta più quelli di cinema.ts esclude i singoli effetti (prove in sviluppo)
+// ?senza=ao,nebbia,bagliore,vignetta,glitch più quelli di cinema.ts esclude i singoli effetti (prove in sviluppo)
 const con = effettoAttivo
 
 /** `sala`: c’è la sala (polvere nel fascio); `fermo`: movimento ridotto, nessuna animazione del volume */
@@ -96,9 +98,50 @@ function Catena({ sala, fermo }: { sala: boolean; fermo: boolean }) {
   )
   const offset = useMemo(() => new Vector2(cinema.aberrazione, cinema.aberrazione * 0.6), [])
 
+  // glitch della camera e sdoppiamento attorno al logo (src/lib/glitch.ts): passaggio a sé, acceso solo
+  // durante un glitch (e nei fotogrammi di riscaldamento, per compilarlo prima): a riposo non costa nulla
+  const disturbo = useMemo(() => new EffettoGlitch(), [])
+  const passaggioGlitch = useMemo(() => {
+    const p = new EffectPass(camera, disturbo)
+    p.enabled = false
+    return p
+  }, [camera, disturbo])
+  useEffect(
+    () => () => {
+      passaggioGlitch.dispose()
+      disturbo.dispose()
+    },
+    [passaggioGlitch, disturbo],
+  )
+  useFrame(({ size }) => {
+    const ora = performance.now()
+    const u = disturbo.uniforms
+    let forza = glitch.forza('camera', ora)
+    let bersaglio: 'camera' | 'logo' = 'camera'
+    if (forza > 0) u.get('tutto')!.value = 1
+    else if ((forza = glitch.forza('logo', ora) * 0.7) > 0 && zonaLogo.larghezza > 0) {
+      bersaglio = 'logo'
+      u.get('tutto')!.value = 0
+      ;(u.get('zona')!.value as Vector4).set(
+        zonaLogo.x / size.width,
+        1 - zonaLogo.y / size.height,
+        (zonaLogo.larghezza * 0.62) / size.width,
+        (zonaLogo.larghezza * 0.5) / size.height,
+      )
+    } else forza = 0
+    u.get('forza')!.value = forza
+    if (forza > 0) {
+      u.get('seme')!.value = glitch.seme(bersaglio, undefined, ora) % 997
+      u.get('semeLuce')!.value = glitch.semeLuce(bersaglio, ora) % 997
+    }
+    // eslint-disable-next-line react/immutability -- passaggio di postprocessing, non stato React
+    passaggioGlitch.enabled = forza > 0 || riscaldamento.attivo
+  })
+
   return (
     <EffectComposer multisampling={4} frameBufferType={HalfFloatType}>
       <>{con('ao') && <N8AO halfRes aoRadius={1.6} distanceFalloff={0.6} intensity={2.2} quality="medium" />}</>
+      <>{con('glitch') && <primitive object={passaggioGlitch} dispose={null} />}</>
       <>{con('nebbia') && <NebbiaPassaggio oggetto={nebbia.passaggio} />}</>
       <>{con('nebbia') && <NebbiaComposizione oggetto={nebbia.composizione} />}</>
       <>{con('fuoco') && <primitive object={fuoco} dispose={null} />}</>

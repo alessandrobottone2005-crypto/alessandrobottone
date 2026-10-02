@@ -8,6 +8,7 @@ import { sguardo } from './sguardo'
 import { caricaLogo } from './modelloLogo'
 import { useVolto } from './VoltoContext'
 import { gsap } from '@/lib/gsap'
+import { avviaGlitch, casoGlitch, glitch, zonaLogo } from '@/lib/glitch'
 import { movimento } from '@/config/movimento'
 import { LuciTeatro } from './LuciTeatro'
 import { CameraImmersiva } from './CameraImmersiva'
@@ -24,7 +25,11 @@ import { PerformanceMonitor } from '@react-three/drei/core/PerformanceMonitor'
 import { LIVELLI, qualita } from './qualita'
 import { PARTI_DA_RISCALDARE, riscaldamento } from './riscaldamento'
 
-/** il sole della fessura serve al computer; il volto resta illuminato dai suoi fari */
+// glitch del logo: le fasce orizzontali del modello scivolano di lato a scatti (spostamento nei vertici,
+// in unità della vista). x = ampiezza, y = fasce per unità, z = scarto delle fasce, w = seme; x = 0 a riposo.
+const glitchLogo = { value: new THREE.Vector4() }
+
+/** il sole della fessura serve al computer; il volto resta illuminato dai suoi fari. In più, le fasce del glitch */
 function senzaSole(m: THREE.Material) {
   if (m.userData.senzaSole) return
   m.userData.senzaSole = true
@@ -32,8 +37,20 @@ function senzaSole(m: THREE.Material) {
   const luci = THREE.ShaderChunk.lights_fragment_begin.replace('#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )', '#if 0')
   m.onBeforeCompile = (shader) => {
     shader.fragmentShader = shader.fragmentShader.replace('#include <lights_fragment_begin>', luci)
+    shader.uniforms.uGlitchLogo = glitchLogo
+    shader.vertexShader = shader.vertexShader.replace('void main() {', 'uniform vec4 uGlitchLogo;\nvoid main() {').replace(
+      '#include <project_vertex>',
+      /* glsl */ `#include <project_vertex>
+      if (uGlitchLogo.x > 0.0) {
+        float fascia = floor(mvPosition.y * uGlitchLogo.y + uGlitchLogo.z);
+        float scelta = fract(sin(fascia * 78.233 + uGlitchLogo.w) * 43758.5453);
+        float verso = fract(sin(fascia * 12.9898 + uGlitchLogo.w * 1.7) * 43758.5453) - 0.5;
+        mvPosition.x += step(0.5, scelta) * verso * uGlitchLogo.x;
+        gl_Position = projectionMatrix * mvPosition;
+      }`,
+    )
   }
-  m.customProgramCacheKey = () => 'volto-senza-sole'
+  m.customProgramCacheKey = () => 'volto-senza-sole-glitch'
 }
 
 function morph(mesh: THREE.Mesh, nome: string, valore: number) {
@@ -76,6 +93,7 @@ export default function Volto3D({ riferimento, controllo, attivo = true }: Props
       <RenderVisibile attivo={attivo} laboratorio={Boolean(riferimento)} />
       {!riferimento && <QualitaAdattiva />}
       {!riferimento && <Riscaldamento />}
+      {!riferimento && <PianificatoreGlitch />}
       <VoltoAnimato riferimento={riferimento} controllo={controllo} modello={risorse.modello.scene} />
       {!riferimento && <Suspense fallback={null}><Ologramma /></Suspense>}
     </Canvas>
@@ -309,10 +327,52 @@ function VoltoAnimato({
     scenaImmersiva.logo.copy(g.position)
     scenaImmersiva.scala = g.scale.x
     if (riferimento) camera.lookAt(0, 0, 0)
+    else glitchDelLogo(g, posa, unita)
   }, -1)
   return (
     <group ref={gruppo} dispose={null}>
       <primitive object={parti.scena} dispose={null} />
     </group>
   )
+}
+
+/**
+ * Glitch del logo (src/lib/glitch.ts): piccoli salti a scatti di posizione, rotazione e altezza, fasce che
+ * scivolano (vertici) e, in post-produzione, lo sdoppiamento attorno al logo. Scritto dopo la posa del fotogramma
+ * e dopo le coordinate condivise (fari, fuoco): al fotogramma dopo il logo torna esattamente com’era.
+ */
+function glitchDelLogo(g: THREE.Group, posa: Posa, unita: number) {
+  const forza = glitch.forza('logo')
+  glitchLogo.value.x = 0
+  if (forza <= 0 || !g.visible) {
+    zonaLogo.larghezza = 0
+    return
+  }
+  const seme = glitch.seme('logo'),
+    caso = casoGlitch
+  const larghezza = posa.larghezza * unita
+  // uno scatto su due il logo salta; le fasce cambiano a ogni scatto
+  const salta = caso(seme) > 0.45 ? forza : 0
+  g.position.x += (caso(seme + 0.1) - 0.5) * 0.09 * larghezza * salta
+  g.position.y += (caso(seme + 0.2) - 0.5) * 0.04 * larghezza * salta
+  g.rotation.z += (caso(seme + 0.3) - 0.5) * 0.08 * salta
+  g.scale.y *= 1 + (caso(seme + 0.4) - 0.5) * 0.12 * salta
+  glitchLogo.value.set(0.14 * larghezza * forza, (6 + caso(seme + 0.5) * 10) / larghezza, caso(seme + 0.6), seme % 113)
+  zonaLogo.x = posa.x
+  zonaLogo.y = posa.y
+  zonaLogo.larghezza = posa.larghezza
+}
+
+/** pianificatore dei glitch (solo home) e Canvas tenuto vivo finché un glitch è in corso */
+function PianificatoreGlitch() {
+  const invalidate = useThree((s) => s.invalidate)
+  useEffect(() => avviaGlitch(), [])
+  useEffect(() => {
+    const tick = () => {
+      if (glitch.attivo && !document.hidden) invalidate()
+    }
+    gsap.ticker.add(tick)
+    return () => gsap.ticker.remove(tick)
+  }, [invalidate])
+  return null
 }

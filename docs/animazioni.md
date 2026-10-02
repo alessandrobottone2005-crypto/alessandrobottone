@@ -44,6 +44,19 @@ file: `src/sections/Portfolio/Portfolio.tsx` (id ScrollTrigger `portfolio-comput
   - `BottoneIcona` (cerchio 40/48/56px) e `Icona` (svg di figma) sono pronti ma per ora si vedono solo in `/laboratorio`
 - **email**: un clic copia l’indirizzo (`src/lib/appunti.ts`, con una soluzione di riserva per i browser senza api degli appunti). l’etichetta diventa “copiata” per 2s, il volto fa l’occhiolino e sorride, gli screen reader sentono “indirizzo email copiato”. se la copia non riesce si apre il programma di posta (`mailto:`). al passaggio del mouse o con il focus compare un piccolo suggerimento con l’indirizzo (fatto con motion).
 
+## glitch
+
+Disturbi casuali che si vedono e si sentono (`src/lib/glitch.ts`, parametri in `movimento.glitch`).
+
+- **pianificatore** (`avviaGlitch`, montato dalla scena 3d della home): uno ogni 12–25s a caso, durata 0,2–0,5s, intensità 0,45–1 (×0,8 a tutto schermo). Parte solo dopo l’ingresso (`audio.avviato`); si ferma con la scheda nascosta e con movimento ridotto (anche cambiato a sito aperto: un glitch in corso si spegne subito) e non disturba chi usa il computer acceso davanti allo schermo (sosta e finestra di un progetto). Se ora non c’è niente da disturbare riprova dopo 2–4s.
+- **bersaglio** scelto fra ciò che è in vista, con pesi: ologramma 3 (chi sono in vista e avatar acceso), logo 1,5 (logo 3d visibile, non ancora schiacciato nell’avatar), camera 1 (scena 3d visibile). Soprattutto l’ologramma.
+- **logo** (`Volto3D.tsx`): piccoli salti a scatti di posizione, rotazione e altezza, fasce orizzontali del modello che scivolano di lato (vertici del materiale) e sdoppiamento attorno al logo nella post-produzione. Applicato dopo la posa del fotogramma: al fotogramma dopo torna identico, `percorso.ts` non cambia.
+- **ologramma** (`Ologramma.tsx`, `ologramma.glsl.ts`): righe spostate, blocchi che pescano da un altro punto, punti persi, salti a un altro fotogramma del video (anche specchiato), copie sfasate nel bianco della palette.
+- **camera** (`EffettoGlitch` in `effettiCinema.ts`, `Rifinitura.tsx`): bande spostate, blocchi, sdoppiamento rgb, righe e una fascia d’ombra, quadro che scivola appena. Passaggio a sé prima di fuoco, tonalità e colore noir (le frange rgb tornano quasi grigie); spento a riposo, quindi senza costo; acceso anche nei fotogrammi di riscaldamento per compilarlo prima. `?senza=glitch` lo esclude.
+- **suono**: a ogni glitch `audio.suona('glitch', { volume, velocita, bus: 'effetti', ciclo: true })` con volume e velocità casuali, fermato alla fine del disturbo: dura quanto il glitch qualunque sia la lunghezza del campione.
+- **sicurezza fotosensibile**: mai due glitch a meno di 1/3s (`emetti` li scarta), ciò che cambia la luminosità (punti persi, fascia d’ombra) cambia al massimo 6 volte al secondo (3 lampi, `glitch.semeLuce`), gli spostamenti a 14 scatti al secondo; nessun lampo bianco: il disturbo non schiarisce mai la scena (solo spostamenti e ombre, righe −12%, fascia −25%).
+- in sviluppo `window.__glitch.emetti({ bersaglio: 'camera', durata: 0.5, intensita: 1 })` lo forza.
+
 ## cursore (`src/components/cursore/Cursore.tsx`)
 
 - esiste solo con il mouse (`(hover: hover) and (pointer: fine)`) e senza movimento ridotto; nasconde il cursore di sistema.
@@ -92,6 +105,7 @@ altre regole:
 | `volto` | `battitoMin` 3s · `battitoMax` 7s · `sonnoDopo` 8s |
 | `blocchi` | `giroPagina` 0,8s (pdf) |
 | `magnetismo` | `pulsanti` 12px |
+| `glitch` | `intervallo` 12–25s · `riprova` 2–4s · `durata` 0,2–0,5s · `intensita` 0,45–1 · `camera` ×0,8 · `pesi` ologramma 3, logo 1,5, camera 1 · `scatti` 14/s · `lampiMax` 3/s · `volume` 0,45–0,85 · `velocita` 0,85–1,25 ([glitch](#glitch)) |
 
 nello stesso file:
 - `media`: i breakpoint (telefono < 768px, tablet 768–1023px, desktop ≥ 1024px, mouse, movimento ridotto)
