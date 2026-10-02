@@ -20,6 +20,8 @@ Il sito separa racconto della home, scena immersiva e interfaccia del computer c
 | Outfit Variable, ChicagoFLF | Outfit per il sito; ChicagoFLF solo dentro lo schermo del computer |
 | postprocessing, @react-three/postprocessing | post-produzione della scena (scaricata con il 3d) |
 | Zod, Sharp, glTF Transform | validazione/build e strumenti di authoring |
+| chess.js | regole degli scacchi nel computer (chunk a parte e web worker) |
+| Funzioni Vercel (Node) | `api/dediche.ts`: dediche su Google Drive, senza librerie |
 
 Zod non è nel runtime di produzione; shadcn è uno strumento di sviluppo, i componenti generati sono sorgenti locali. Le versioni esatte sono nel lockfile.
 
@@ -49,8 +51,10 @@ Zod non è nel runtime di produzione; shadcn è uno strumento di sviluppo, i com
 │  ├─ og.png
 │  └─ robots.txt
 ├─ index.html                meta, lingua, titolo e favicon
-├─ vite.config.ts            controllo progetti, avviso sui crediti, preload font e alias @
-├─ vercel.json               fallback SPA delle rotte
+├─ api/                      funzioni Vercel: dediche.ts (archivio delle dediche su Google Drive)
+├─ .env.example              nomi delle variabili delle dediche, senza valori
+├─ vite.config.ts            controllo progetti, avviso sui crediti, preload font, alias @, /api/dediche finta in sviluppo
+├─ vercel.json               fallback SPA delle rotte (tranne /api/)
 ├─ .vercelignore             esclusioni dal caricamento di deploy
 └─ src/
    ├─ main.tsx, App.tsx, router.tsx
@@ -60,6 +64,7 @@ Zod non è nel runtime di produzione; shadcn è uno strumento di sviluppo, i com
    ├─ components/
    │  ├─ volto/              SVG, context, sguardo, logo V2, avatar, sala, mondo, computer 3d e post-produzione
    │  ├─ computer/           interfaccia finder 1984, inquadratura, stato, finestre e blocchi lazy (blocchi/)
+   │  │  └─ app/             applicazioni della scrivania: scacchi (avversario in web worker), paint, dediche
    │  ├─ nome/               nome e cognome in metallo (Canvas leggero a parte) e caricamento del font
    │  ├─ cursore/            cursore e segnale cursore:ricalcola
    │  ├─ preloader/, testo/, interazioni/, effetti/
@@ -121,5 +126,7 @@ GSAP e Motion non animano le stesse proprietà dello stesso elemento. GSAP scriv
 ## computer e laboratorio
 
 `router.tsx` accetta `/` e `/progetti/:slug`; la finestra del progetto in `Finder.tsx` segue l’indirizzo. La home resta montata. Ogni blocco si scarica soltanto se usato. [Computer](computer.md).
+
+Le applicazioni della scrivania (scacchi, paint, dediche) sono chunk separati; le dediche passano dalla funzione `api/dediche.ts`, che in sviluppo è sostituita da un archivio in memoria. `tsconfig.node.json` controlla anche `api/`; la build Vite non la include nel sito. [Dediche su Google Drive](dediche-google-drive.md).
 
 `/laboratorio` è dietro `import.meta.env.DEV`: serve a provare stati, sguardo, azioni, volto 3d e cursore; non è pubblicato.

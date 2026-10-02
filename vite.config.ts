@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
 import { validaProgetti } from './scripts/valida-progetti.ts'
 import { sito } from './src/config/sito.ts'
+import { archivioMemoria, gestisci } from './api/dediche.ts'
 
 // controlla tutti i progetti: in build si ferma con un messaggio chiaro, in sviluppo avvisa nel terminale
 function controllaProgetti(): Plugin {
@@ -41,6 +42,32 @@ function controllaCrediti(): Plugin {
   }
 }
 
+// /api/dediche in sviluppo: lo stesso gestore della funzione vercel, con le dediche in memoria (niente google)
+function dedicheFinte(): Plugin {
+  return {
+    name: 'dediche-finte',
+    apply: 'serve',
+    configureServer(server) {
+      const archivio = archivioMemoria()
+      server.middlewares.use('/api/dediche', async (req, res) => {
+        const parti: Buffer[] = []
+        for await (const parte of req) parti.push(parte as Buffer)
+        const headers = new Headers()
+        for (const [k, v] of Object.entries(req.headers)) if (typeof v === 'string') headers.set(k, v)
+        const richiesta = new Request(`http://localhost${req.originalUrl ?? req.url}`, {
+          method: req.method,
+          headers,
+          body: req.method === 'GET' || req.method === 'HEAD' ? undefined : Buffer.concat(parti),
+        })
+        const risposta = await gestisci(richiesta, archivio)
+        res.statusCode = risposta.status
+        risposta.headers.forEach((v, k) => res.setHeader(k, v))
+        res.end(Buffer.from(await risposta.arrayBuffer()))
+      })
+    },
+  }
+}
+
 // precarica il file di outfit (caratteri latini), così il testo non cambia font dopo il caricamento
 function precaricaFont(): Plugin {
   const nome = /outfit-latin-wght-normal.*\.woff2$/
@@ -63,7 +90,7 @@ function precaricaFont(): Plugin {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss(), controllaProgetti(), controllaCrediti(), precaricaFont()],
+  plugins: [react(), tailwindcss(), controllaProgetti(), controllaCrediti(), precaricaFont(), dedicheFinte()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
