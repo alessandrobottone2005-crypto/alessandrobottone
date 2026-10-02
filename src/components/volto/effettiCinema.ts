@@ -1,5 +1,5 @@
 // effetti di post-produzione scritti per la resa «cinema» (cinema.ts): colore e striscia anamorfica.
-import { BlendFunction, Effect } from 'postprocessing'
+import { BlendFunction, Effect, EffectAttribute } from 'postprocessing'
 import * as THREE from 'three'
 import { cinema } from './cinema'
 
@@ -87,6 +87,61 @@ export class EffettoStriscia extends Effect {
           ['bagliore', new THREE.Uniform(bagliore)],
           ['intensita', new THREE.Uniform(cinema.striscia.intensita)],
           ['lunghezza', new THREE.Uniform(cinema.striscia.lunghezza)],
+        ]),
+      },
+    )
+  }
+}
+
+/**
+ * glitch della camera (src/lib/glitch.ts): bande spostate a scatti, blocchi, sdoppiamento rgb e righe più scure.
+ * Vive in un passaggio a sé, prima di fuoco, tonalità e colore noir: le frange rgb poi tornano quasi grigie.
+ * A riposo il passaggio è spento (nessun costo). `zona` (centro e mezza misura in uv) limita il disturbo
+ * attorno al logo; `tutto` = 1 per lo schermo intero. Mai più chiaro della scena: solo spostamenti e ombre.
+ */
+export class EffettoGlitch extends Effect {
+  constructor() {
+    super(
+      'GlitchCamera',
+      /* glsl */ `
+      uniform float forza;
+      uniform float seme;
+      uniform float semeLuce;
+      uniform float tutto;
+      uniform vec4 zona;
+      float caso(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+      void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
+        float dentro = max(tutto, step(abs(uv.x - zona.x), zona.z) * step(abs(uv.y - zona.y), zona.w));
+        if (forza <= 0. || dentro <= 0.) { outputColor = inputColor; return; }
+        vec2 p = uv;
+        // bande orizzontali di altezza variabile che scivolano di lato
+        float banda = floor(uv.y * (14. + 26. * caso(vec2(seme, 1.))));
+        p.x += step(1. - .4 * forza, caso(vec2(banda, seme))) * (caso(vec2(banda, seme + 3.)) - .5) * .1 * forza;
+        // blocchi che saltano
+        vec2 cella = floor(uv * vec2(16., 9.));
+        if (caso(cella + seme * 1.7) > 1. - .12 * forza)
+          p += (vec2(caso(cella + seme + 2.), caso(cella + seme + 4.)) - .5) * vec2(.08, .03) * forza;
+        // tutto il quadro scivola appena in verticale, come un segnale che perde l’aggancio
+        p.y += tutto * (caso(vec2(seme, 9.)) - .5) * .02 * forza;
+        p = clamp(p, vec2(0.), vec2(1.));
+        float o = (.003 + .006 * caso(vec2(seme, 5.))) * forza;
+        vec4 c = texture2D(inputBuffer, p);
+        c.r = texture2D(inputBuffer, clamp(p + vec2(o, 0.), 0., 1.)).r;
+        c.b = texture2D(inputBuffer, clamp(p - vec2(o, 0.), 0., 1.)).b;
+        // righe di scansione e una fascia d’ombra (cambia al ritmo dei lampi): solo più scure, mai più chiare
+        float righe = 1. - .12 * forza * step(.5, fract(uv.y / texelSize.y / 4.));
+        float ombra = 1. - .25 * forza * step(abs(uv.y - caso(vec2(semeLuce, 7.))), .04);
+        outputColor = vec4(c.rgb * righe * ombra, inputColor.a);
+      }`,
+      {
+        attributes: EffectAttribute.CONVOLUTION,
+        blendFunction: BlendFunction.SET,
+        uniforms: new Map<string, THREE.Uniform>([
+          ['forza', new THREE.Uniform(0)],
+          ['seme', new THREE.Uniform(0)],
+          ['semeLuce', new THREE.Uniform(0)],
+          ['tutto', new THREE.Uniform(1)],
+          ['zona', new THREE.Uniform(new THREE.Vector4())],
         ]),
       },
     )

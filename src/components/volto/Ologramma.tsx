@@ -11,6 +11,7 @@ import { sguardo } from './sguardo'
 import { useVolto } from './VoltoContext'
 import { frammento, vertice } from './ologramma.glsl'
 import { riscaldamento } from './riscaldamento'
+import { casoGlitch, glitch } from '@/lib/glitch'
 
 // atlante: celle 4×2, tre fotogrammi per cella (uno per canale)
 const GRIGLIA = new THREE.Vector2(4, 2)
@@ -64,6 +65,9 @@ export function Ologramma() {
           uColore: { value: new THREE.Color('#c9c5c0') },
           uComparsa: { value: 0 },
           uTempo: { value: 0 },
+          uGlitch: { value: 0 },
+          uSeme: { value: 0 },
+          uSemeLuce: { value: 0 },
         },
         transparent: true,
         depthWrite: false,
@@ -134,12 +138,22 @@ export function Ologramma() {
     g.scale.setScalar(box.width * unita)
     g.rotation.x = THREE.MathUtils.degToRad(a.inclinazioneMax) * s.inclinazione
 
+    // glitch (src/lib/glitch.ts): a scatti salta a un altro fotogramma, il piano trema; il resto lo fa lo shader
+    const forza = glitch.forza('ologramma')
+    const seme = forza > 0 ? glitch.seme('ologramma') : 0
+    const salto = forza > 0 && casoGlitch(seme + 0.7) > 0.55
+    if (forza > 0) g.position.x += (casoGlitch(seme + 0.8) - 0.5) * 0.05 * box.width * unita * forza
     imposta(busto, {
       // fotogramma più vicino: niente dissolvenze, quindi niente punti doppi
-      uFotogramma: Math.round(Math.abs(s.giro) * (a.fotogrammi - 1)),
-      uSpecchio: s.giro > 0 ? 1 : 0,
+      uFotogramma: salto
+        ? Math.floor(casoGlitch(seme + 0.9) * a.fotogrammi)
+        : Math.round(Math.abs(s.giro) * (a.fotogrammi - 1)),
+      uSpecchio: (s.giro > 0) !== (salto && casoGlitch(seme + 1.1) > 0.5) ? 1 : 0,
       uComparsa: morbido(THREE.MathUtils.clamp((scambio - 0.3) / 0.6, 0, 1)),
       uTempo: ora % 1000,
+      uGlitch: forza,
+      uSeme: seme % 997,
+      uSemeLuce: forza > 0 ? glitch.semeLuce('ologramma') % 997 : 0,
     })
   }, -1.5)
 

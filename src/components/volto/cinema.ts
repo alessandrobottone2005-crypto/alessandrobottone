@@ -1,5 +1,5 @@
 // parametri della resa «cinema» della scena 3d (claude.md §6, docs/ambiente-3d.md).
-// ogni effetto si spegne con ?senza=fuoco,polvere,grana,alone,aberrazione,striscia,colore,respiro per i confronti.
+// ogni effetto si spegne con ?senza=fuoco,polvere,grana,alone,aberrazione,striscia,colore,respiro,glitch per i confronti.
 export const cinema = {
   // profondità di campo: il fuoco segue il protagonista (volto, poi schermo del computer);
   // vicino al computer la zona nitida si allarga a tutto il computer (scala ×4) e al volto dietro il monitor

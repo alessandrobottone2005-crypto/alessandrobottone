@@ -140,6 +140,25 @@ export const movimento = {
   magnetismo: {
     pulsanti: 12,
   },
+
+  // glitch casuali di logo, ologramma e camera (src/lib/glitch.ts, docs/animazioni.md#glitch)
+  glitch: {
+    // secondi tra un glitch e l’altro, e attesa se ora non c’è niente da disturbare
+    intervallo: [12, 25],
+    riprova: [2, 4],
+    // durata (s) e intensità (0–1); a tutto schermo l’intensità si riduce ancora (× camera)
+    durata: [0.2, 0.5],
+    intensita: [0.45, 1],
+    camera: 0.8,
+    // quanto spesso viene scelto ciascun bersaglio quando è in vista: soprattutto l’ologramma
+    pesi: { ologramma: 3, logo: 1.5, camera: 1 },
+    // cambi di posizione al secondo (scatti); la luminosità cambia al massimo 3 lampi al secondo
+    scatti: 14,
+    lampiMax: 3,
+    // suono: volume e velocità di riproduzione casuali
+    volume: [0.45, 0.85],
+    velocita: [0.85, 1.25],
+  },
 } as const
 
 // breakpoint (claude.md §10)
