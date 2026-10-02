@@ -46,7 +46,8 @@
   border-radius: 0;
   /* fascia in alto per il nome fisso del sito */
   padding-top: calc(env(safe-area-inset-top) + 64px);
-  padding-bottom: env(safe-area-inset-bottom);
+  /* fascia in basso per il pulsante dell’audio (48px + margini): non copre «invia» e i comandi delle finestre */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 72px);
   background: var(--mac-nero);
 }
 /* sullo schermo il cursore del sito lascia il posto alla freccia pixel */

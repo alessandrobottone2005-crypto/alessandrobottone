@@ -63,3 +63,4 @@ src/content/progetti/*/_originali/*.glb
 sorgenti/test-*/
 sorgenti/audio/*.mp3
 sorgenti/audio/*.wav
+.claude/worktrees/

@@ -101,6 +101,8 @@ export default defineConfig({
     include: [
       'react-pdf',
       'page-flip/dist/js/page-flip.module.js',
+      // scacchi: caricato solo all’apertura dell’app, senza questa voce in sviluppo il primo import fallisce
+      'chess.js',
       '@react-three/fiber',
       '@react-three/drei/core/OrbitControls',
       '@react-three/drei/core/ContactShadows',
