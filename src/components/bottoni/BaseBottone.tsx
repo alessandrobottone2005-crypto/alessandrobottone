@@ -31,6 +31,8 @@ export type PropsBase = {
   className?: string
   /** spostamento magnetico massimo in pixel */
   magnete?: number
+  /** pulsante a due stati (es. audio attivo/muto): diventa aria-pressed */
+  premuto?: boolean
 }
 
 type Props = PropsBase & {
@@ -51,6 +53,7 @@ export function BaseBottone({
   etichetta,
   className,
   magnete,
+  premuto,
   forma,
   bordo,
   contenuto,
@@ -175,6 +178,7 @@ export function BaseBottone({
           onClick={onClick}
           disabled={disattivato}
           aria-label={etichetta}
+          aria-pressed={premuto}
           aria-describedby={suggerimento ? idSuggerimento : undefined}
           className={classi}
           {...eventi}

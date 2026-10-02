@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useAvvio } from '@/components/preloader/AvvioContext'
-import { InvitoScorrere } from '@/components/preloader/InvitoScorrere'
 import { NomeMetallo } from '@/components/nome/NomeMetallo'
 import { NomePesoVariabile } from '@/components/testo/NomePesoVariabile'
 import { TestoCheRotola } from '@/components/testo/TestoCheRotola'
@@ -153,7 +152,6 @@ export function Header() {
           },
         })
         FASI.forEach((f, i) => tl.addLabel(f, INIZI[i]))
-        tl.to(q('[data-invito]'), { opacity: 0, duration: 2 }, 0)
         tl.fromTo(q('[data-interfaccia]'), { opacity: 0 }, { opacity: 1, duration: 2, immediateRender: false }, 0.5)
         tl.to(spostamento, { attr: { scale: 6 }, duration: 12, onUpdate: aggiornaFiltro }, 3)
         tl.to(q('[data-schizzi] [data-disegna]'), { drawSVG: '100%', duration: 6, stagger: 0.8 }, 4)
@@ -280,7 +278,6 @@ export function Header() {
         >
           <TestoCheRotola testo={fase >= 0 ? FASI[fase] : ''} />
         </div>
-        <InvitoScorrere respira={pronto && !ridotto} />
       </div>
     </section>
   )

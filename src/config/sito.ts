@@ -36,7 +36,6 @@ export const sito = {
     logo: 'logo di alessandro bottone',
     navigazione: 'navigazione principale',
     tornaInizio: 'alessandro bottone — torna all’inizio',
-    invito: 'scorri per esplorare',
   },
 
   // etichette dei tre pulsanti dei contatti
@@ -100,4 +99,15 @@ export const sito = {
     avanzamento: 'avanzamento del video',
     video: (titolo: string) => `video di ${titolo}`,
   },
+} as const
+
+// ingresso nel sito (docs/audio.md): il pulsante che sblocca lo scroll e avvia l’audio
+export const ingresso = {
+  pulsante: 'inizia a scrollare',
+} as const
+
+// pulsante dell’audio, fisso in basso a destra
+export const audio = {
+  attiva: 'attiva audio',
+  disattiva: 'disattiva audio',
 } as const

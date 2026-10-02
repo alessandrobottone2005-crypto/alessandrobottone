@@ -19,7 +19,8 @@
     "genera-og": "node scripts/genera-og.mjs",
     "genera-nome-3d": "node scripts/genera-nome-3d.mjs",
     "comprimi-pdf": "swift scripts/comprimi-pdf.swift",
-    "misura-fluidita": "node scripts/misura-fluidita.mjs"
+    "misura-fluidita": "node scripts/misura-fluidita.mjs",
+    "prepara-audio": "node scripts/prepara-audio.mjs"
   },
   "dependencies": {
     "@fontsource-variable/outfit": "^5.3.0",

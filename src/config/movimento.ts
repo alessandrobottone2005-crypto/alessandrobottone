@@ -156,3 +156,28 @@ export const volto = {
   preloader: 'max(30vmin, 12rem)',
   header: 'min(86vw, 104svh)',
 } as const
+
+// audio (docs/audio.md): volumi da 0 a 1, tempi in secondi
+export const audio = {
+  volume: {
+    // musica di sottofondo
+    musica: 0.35,
+    effetti: 0.5,
+    computer: 0.55,
+    // la ventola davanti al computer e l’accordo d’avvio, dentro il bus del computer
+    ventola: 0.35,
+    accordo: 0.6,
+  },
+  /** musica abbassata mentre si usa il computer, in dB */
+  abbassaDb: -10,
+  rampaAbbassa: 0.8,
+  entrataMusica: 2,
+  dissolvenzaMuto: 0.3,
+  entrataCiclo: 0.8,
+  uscitaCiclo: 0.6,
+  /** l’accordo suona quando lo schermo si illumina, dopo il relè e la ventola */
+  ritardoAccordo: 0.9,
+  /** durata esatta dei file in ciclo (il codificatore aggiunge qualche ms di silenzio in fondo): vanno
+   * aggiornate se cambiano in scripts/prepara-audio.mjs */
+  cicli: { musica: 92.16, ventola: 6 },
+} as const

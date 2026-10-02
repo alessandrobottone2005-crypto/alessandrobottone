@@ -1,6 +1,8 @@
 // bottone rotondo con sola icona (figma: icon button_atoms, misure small / medium / big).
 // l’etichetta è obbligatoria: è il nome che leggono gli screen reader.
+// l’icona è una di figma (per nome) oppure un elemento già pronto (es. lucide, che segue currentColor).
 // attenzione: small (40px) è sotto l’area toccabile minima su mobile (48px, claude.md §12).
+import type { ReactElement } from 'react'
 import { Icona, type TipoIcona } from '@/components/icone/Icona'
 import { BaseBottone, type PropsBase } from './BaseBottone'
 
@@ -13,7 +15,7 @@ const FORMA: Record<MisuraBottoneIcona, string> = {
 }
 
 type Props = Omit<PropsBase, 'etichetta' | 'suggerimento'> & {
-  icona: TipoIcona
+  icona: TipoIcona | ReactElement
   etichetta: string
   dimensione?: MisuraBottoneIcona
 }
@@ -25,7 +27,9 @@ export function BottoneIcona({ icona, dimensione = 'medium', className, ...props
       className={'inline-block ' + (className ?? '')}
       forma={FORMA[dimensione]}
       bordo="border-2"
-      contenuto={() => <Icona tipo={icona} misura={dimensione === 'small' ? 16 : 24} />}
+      contenuto={() =>
+        typeof icona === 'string' ? <Icona tipo={icona} misura={dimensione === 'small' ? 16 : 24} /> : icona
+      }
     />
   )
 }
