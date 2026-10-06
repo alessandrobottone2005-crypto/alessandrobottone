@@ -51,7 +51,7 @@ function Riserva() {
   )
 }
 export function LogoContinuo() {
-  const { pronto } = useAvvio()
+  const { pronto, preparaScena } = useAvvio()
   const { azione, ridotto } = useVolto()
   useEffect(() => {
     if (!pronto || ridotto) return
@@ -65,7 +65,7 @@ export function LogoContinuo() {
     addEventListener('pointerup', clic)
     return () => removeEventListener('pointerup', clic)
   }, [pronto, ridotto, azione])
-  if (!pronto || ridotto) return null
+  if ((!pronto && !preparaScena) || ridotto) return null
   return (
     <div data-logo-continuo aria-hidden="true" className="pointer-events-none fixed inset-0 z-10">
       <ScenaProtetta>

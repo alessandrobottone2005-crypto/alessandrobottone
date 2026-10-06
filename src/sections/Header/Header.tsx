@@ -11,7 +11,7 @@ import { disciplineVisibili, webDesignAttivo } from '@/config/discipline'
 import { media, movimento, volto as misure } from '@/config/movimento'
 import { sito } from '@/config/sito'
 import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
-import { getLenis } from '@/lib/scroll'
+import { tornaA } from '@/lib/scroll'
 import { FINESTRA, ID_MATITA } from './misure'
 import { Tavola } from './Tavola'
 
@@ -24,11 +24,12 @@ const FINE = 100 - SALTO
 const INIZIO_FINALE = movimento.header.inizioNomeCompatto - SALTO
 
 export function Header() {
-  const { pronto, voltoHeader } = useAvvio()
+  const { pronto, entrato, voltoHeader } = useAvvio()
   const palco = useRef<HTMLDivElement>(null)
   const nome = useRef<HTMLDivElement>(null)
   const ritornoInizio = useRef<HTMLAnchorElement>(null)
   const [fase, setFase] = useState(-1)
+  const faseRef = useRef(-1)
   const [ridotto, setRidotto] = useState(() => matchMedia(media.ridotto).matches)
   const [guardaGiu, setGuardaGiu] = useState(false)
   useEffect(() => {
@@ -87,7 +88,7 @@ export function Header() {
           // La quota percentuale compensa anche la larghezza variabile delle lettere al passaggio del mouse.
           x: (i: number) => mobile ? nome.current!.clientWidth / 2 - 16 : i === 0 ? nome.current!.clientWidth - 64 : 0,
           xPercent: (i: number) => mobile ? -50 : i === 0 ? -100 : 0,
-          y: (i: number, el: HTMLElement) => (mobile ? 24 : 32) + i * fontPiccolo * 1.05 - el.offsetTop,
+          y: (i: number, el: HTMLElement) => ((mobile ? 24 : 32) + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 0)) + i * fontPiccolo * 1.05 - el.offsetTop,
           scale: () => fontPiccolo / parseFloat(getComputedStyle(nome.current!).fontSize),
         }
         gsap.set(parole, { transformOrigin: 'right top' })
@@ -147,7 +148,8 @@ export function Header() {
             invalidateOnRefresh: true,
             onUpdate: (st) => {
               const t = st.progress * FINE
-              setFase(t < 1.2 ? -1 : INIZI.findLastIndex((inizio) => t >= inizio))
+              const prossima = t < 1.2 ? -1 : INIZI.findLastIndex((inizio) => t >= inizio)
+              if (faseRef.current !== prossima) { faseRef.current = prossima; setFase(prossima) }
             },
           },
         })
@@ -224,7 +226,7 @@ export function Header() {
             ref={nome}
             data-nome
             aria-hidden="true"
-            className="pointer-events-none fixed inset-0 z-40 flex h-svh flex-col justify-between px-4 pt-6 pb-8 text-[clamp(2.5rem,min(10vw,14svh),9rem)] leading-[.85] tracking-[-.04em] md:px-8 md:pt-8"
+            className="pointer-events-none fixed inset-0 z-40 flex h-svh flex-col justify-between px-4 pt-[calc(var(--safe-top)+24px)] pb-8 text-[clamp(2.5rem,min(10vw,14svh),9rem)] leading-[.85] tracking-[-.04em] md:px-8 md:pt-[calc(var(--safe-top)+96px)]"
           >
             <span data-parola-nome className="self-center md:self-start">
               <NomePesoVariabile testo={sito.nome} className="block" pesoMin={900} pesoMax={900} />
@@ -234,7 +236,17 @@ export function Header() {
             </span>
           </div>
           {!ridotto && <NomeMetallo radice={nome} />}
-          <nav aria-label={sito.etichette.navigazione} className="pointer-events-none fixed top-5 right-3 z-40 md:top-7 md:right-7">
+          {pronto && entrato && (
+            <nav aria-label={sito.etichette.navigazione} className="navigazione-sezioni">
+              {([['portfolio', sito.sezioni.portfolio], ['chi-sono', sito.sezioni.chiSono], ['contatti', sito.sezioni.contatti]] as const).map(([id, testo]) => (
+                <a key={id} href={`#${id}`} onClick={(e) => {
+                  e.preventDefault()
+                  tornaA(id, true)
+                }}>{testo}</a>
+              ))}
+            </nav>
+          )}
+          <div className="ritorno-inizio pointer-events-none fixed z-40">
             <a
               ref={ritornoInizio}
               href="#header"
@@ -242,13 +254,10 @@ export function Header() {
               className="pointer-events-auto invisible block h-12 w-28 rounded-sm opacity-0 transition-shadow hover:shadow-[0_1px_0_var(--color-bianco)] focus-visible:shadow-[0_1px_0_var(--color-bianco)] active:opacity-70"
               onClick={(e) => {
                 e.preventDefault()
-                const lenis = getLenis()
-                if (lenis) lenis.scrollTo(0)
-                else window.scrollTo({ top: 0, behavior: 'instant' })
-                document.getElementById('header')?.focus({ preventScroll: true })
+                tornaA('header', true)
               }}
             />
-          </nav>
+          </div>
         </>,
         document.body,
       )}

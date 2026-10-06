@@ -1,6 +1,6 @@
-// preriscaldamento della scena: quando sala, computer e avatar sono scaricati, mentre il Canvas è ancora
-// invisibile (header 2d), si compilano tutti gli shader, si caricano le texture sulla gpu e si disegnano
-// alcuni fotogrammi completi. così il primo fotogramma visibile del 3d (e del chi sono) non scatta.
+// Preriscaldamento incrementale durante l’header 2d: un upload o un oggetto da compilare per tick.
+// Dopo l’arrivo di sala, computer e avatar, pochi render preparano anche la post-produzione.
+// Non trattiene l’ingresso: se l’utente raggiunge subito il 3d, il rendering normale ha precedenza.
 export const riscaldamento = {
   /** true per i pochi fotogrammi del preriscaldamento: volto e avatar si disegnano anche se nascosti */
   attivo: false,

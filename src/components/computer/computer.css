@@ -44,8 +44,10 @@
 }
 .mac-schermo[data-telefono] {
   border-radius: 0;
-  /* fascia in alto per il nome fisso del sito */
-  padding-top: calc(env(safe-area-inset-top) + 64px);
+  /* fascia condivisa con nome e collegamenti, anche con safe area iOS */
+  padding-top: var(--nav-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
   /* fascia in basso per il pulsante dell’audio (48px + margini): non copre «invia» e i comandi delle finestre */
   padding-bottom: calc(env(safe-area-inset-bottom) + 72px);
   background: var(--mac-nero);
@@ -529,4 +531,21 @@ html.cursore-personalizzato .mac-schermo * {
 }
 .mac-documento a {
   text-decoration: underline;
+}
+
+/* Sul telefono i menu e la chiusura restano toccabili anche con poche righe disponibili. */
+.mac-schermo[data-telefono] .mac-barra { height: 44px; }
+.mac-schermo[data-telefono] .mac-titolo { height: 44px; }
+.mac-schermo[data-telefono] .mac-chiudi { top: 15px; }
+.mac-schermo[data-telefono] .mac-icone-scrivania {
+  bottom: 12px;
+  overflow-y: auto;
+}
+@media (max-height: 500px) {
+  .mac-schermo[data-telefono] .mac-icone-scrivania {
+    left: 12px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(88px, 1fr));
+    align-content: start;
+  }
 }

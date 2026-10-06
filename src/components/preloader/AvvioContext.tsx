@@ -5,6 +5,9 @@ import { createContext, useContext, useMemo, useRef, useState, type ReactNode, t
 type Valore = {
   pronto: boolean
   setPronto: (p: boolean) => void
+  /** prepara la scena durante l’uscita del preloader, prima di mostrare il pulsante d’ingresso */
+  preparaScena: boolean
+  setPreparaScena: (p: boolean) => void
   /** ingresso fatto: fino ad allora lo scroll resta bloccato. Con un link diretto a un progetto è già vero */
   entrato: boolean
   setEntrato: (e: boolean) => void
@@ -16,9 +19,10 @@ const Contesto = createContext<Valore | null>(null)
 
 export function AvvioProvider({ children }: { children: ReactNode }) {
   const [pronto, setPronto] = useState(false)
+  const [preparaScena, setPreparaScena] = useState(false)
   const [entrato, setEntrato] = useState(() => location.pathname.startsWith('/progetti/'))
   const voltoHeader = useRef<HTMLDivElement>(null)
-  const valore = useMemo(() => ({ pronto, setPronto, entrato, setEntrato, voltoHeader }), [pronto, entrato])
+  const valore = useMemo(() => ({ pronto, setPronto, preparaScena, setPreparaScena, entrato, setEntrato, voltoHeader }), [pronto, preparaScena, entrato])
   return <Contesto.Provider value={valore}>{children}</Contesto.Provider>
 }
 

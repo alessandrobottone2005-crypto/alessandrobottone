@@ -72,12 +72,12 @@ export const sito = {
       saluto: 'hello',
     },
     copertina: (titolo: string) => `copertina di ${titolo}`,
-    // crediti obbligatori del modello (cc by): autore e link vanno completati prima di pubblicare
+    // attribuzione cc by 4.0, incluse le modifiche alla copia derivata
     crediti: {
-      modello: 'modello 3d del computer: autore da indicare · licenza cc by 4.0',
-      modelloLink: '',
-      ambiente: 'sala di cemento: autore da indicare · licenza da verificare',
-      ambienteLink: '',
+      modello: 'postazione «macintosh 128k»: kreems · licenza cc by 4.0 · modifiche: marchi rimossi, schermo adattato e ottimizzazione web',
+      modelloLink: 'https://sketchfab.com/3d-models/macintosh-128k-896ea439b67b4606a23fb8b93be6af6d',
+      ambiente: 'sala di cemento «brutalism scene baked»: abhayexe · licenza free standard sketchfab',
+      ambienteLink: 'https://sketchfab.com/3d-models/brutalism-scene-baked-93ba334484ca44058f6dde30a3d4f066',
       carattere: 'carattere chicagoflf di robin casady · dominio pubblico',
     },
   },

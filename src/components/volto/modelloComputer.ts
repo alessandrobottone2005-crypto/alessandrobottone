@@ -1,4 +1,4 @@
-// Computer.glb ottimizzato (npm run prepara-computer): un solo download, condiviso
+// Postazione Macintosh ottimizzata (npm run prepara-computer): un solo download, condiviso
 // tra scena principale e versione con movimento ridotto. Se fallisce, l’interfaccia resta in 2d.
 import type { Group } from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'

@@ -149,7 +149,7 @@ function Catena({ sala, fermo }: { sala: boolean; fermo: boolean }) {
       <>{con('alone') && <primitive object={alone} dispose={null} />}</>
       <>{con('alone') && con('striscia') && <primitive object={striscia} dispose={null} />}</>
       <>{con('vignetta') && <Vignette offset={cinema.vignetta.offset} darkness={cinema.vignetta.darkness} />}</>
-      <ToneMapping mode={ToneMappingMode.AGX} />
+      <>{con('tonalita') && <ToneMapping mode={ToneMappingMode.AGX} />}</>
       <>{con('colore') && <primitive object={colore} dispose={null} />}</>
       <>{con('aberrazione') && <ChromaticAberration offset={offset} radialModulation modulationOffset={0.3} />}</>
       <>{con('grana') && <Noise premultiply blendFunction={BlendFunction.SOFT_LIGHT} opacity={cinema.grana} />}</>

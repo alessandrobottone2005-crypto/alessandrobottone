@@ -21,8 +21,7 @@ import { Mondo } from './Mondo'
 import { Ologramma } from './Ologramma'
 import { PolvereNelFascio } from './PolvereNelFascio'
 import { effettoAttivo } from './cinema'
-import { PerformanceMonitor } from '@react-three/drei/core/PerformanceMonitor'
-import { LIVELLI, qualita } from './qualita'
+import { LIVELLI, limitaFrame, qualita } from './qualita'
 import { PARTI_DA_RISCALDARE, riscaldamento } from './riscaldamento'
 
 // glitch del logo: le fasce orizzontali del modello scivolano di lato a scatti (spostamento nei vertici,
@@ -105,10 +104,10 @@ function RenderVisibile({ attivo, laboratorio }: { attivo: boolean; laboratorio:
   const invalidate = useThree((s) => s.invalidate)
   useEffect(() => {
     let visibile = false
+    const richiedi = limitaFrame(invalidate)
     const tick = () => {
       const ora = attivo && !document.hidden && (laboratorio || riscaldamento.attivo || percorso.header.opacity > 0.001)
-      if (ora || ora !== visibile) invalidate()
-      visibile = ora
+      if ((ora || ora !== visibile) && richiedi()) visibile = ora
     }
     gsap.ticker.add(tick)
     return () => gsap.ticker.remove(tick)
@@ -119,46 +118,103 @@ function RenderVisibile({ attivo, laboratorio }: { attivo: boolean; laboratorio:
 /** la risoluzione interna segue i fotogrammi reali: scende se non regge i 60fps, risale quando c’è margine */
 function QualitaAdattiva() {
   const setDpr = useThree((s) => s.setDpr)
+  const campione = useRef({ inizio: 0, frame: 0, buoni: 0, lenti: 0, cambio: 0 })
   useEffect(() => qualita.ascolta((l) => setDpr(LIVELLI[l].dpr)), [setDpr])
-  return (
-    <PerformanceMonitor
-      flipflops={4}
-      onDecline={() => qualita.imposta(qualita.livello - 1)}
-      onIncline={() => qualita.imposta(qualita.livello + 1)}
-    />
-  )
+  useEffect(() => {
+    const reset = () => Object.assign(campione.current, { inizio: 0, frame: 0, buoni: 0, lenti: 0 })
+    document.addEventListener('visibilitychange', reset)
+    return () => document.removeEventListener('visibilitychange', reset)
+  }, [])
+  useFrame(() => {
+    const c = campione.current
+    const ora = performance.now()
+    if (qualita.bloccata || document.hidden || riscaldamento.attivo || percorso.header.opacity <= 0.001) {
+      Object.assign(c, { inizio: 0, frame: 0, buoni: 0, lenti: 0 })
+      return
+    }
+    if (!c.inizio) { c.inizio = ora; return }
+    c.frame++
+    const durata = ora - c.inizio
+    if (durata < 1000) return
+    const fps = c.frame * 1000 / durata
+    c.buoni = fps >= 58 ? c.buoni + durata : 0
+    c.lenti = fps < 52 ? c.lenti + durata : 0
+    if (c.lenti >= 2000 && ora - c.cambio >= 3000 && qualita.livello > 0) {
+      qualita.imposta(qualita.livello - 1)
+      Object.assign(c, { cambio: ora, buoni: 0, lenti: 0 })
+    } else if (c.buoni >= 12000 && ora - c.cambio >= 15000 && qualita.livello < 3) {
+      qualita.imposta(qualita.livello + 1)
+      Object.assign(c, { cambio: ora, buoni: 0, lenti: 0 })
+    }
+    c.inizio = ora
+    c.frame = 0
+  })
+  return null
 }
 
-/** shader, texture e post-produzione pronti prima che il 3d si veda (riscaldamento.ts) */
+/** Prepara le risorse man mano che arrivano, senza aspettare il download dell’intera scena. */
 function Riscaldamento() {
   const { gl, scene, camera, invalidate } = useThree()
   useEffect(() => {
+    let annullato = false
+    let compilando = false
+    let firma = ''
     let fotogrammi = 0
+    const viste = new Set<THREE.Texture>()
+    const coda: THREE.Texture[] = []
+    let shader: THREE.Object3D[] = []
+    riscaldamento.fatto = false
+    riscaldamento.attivo = false
     const tick = () => {
       if (riscaldamento.fatto) return gsap.ticker.remove(tick)
-      const pronti = PARTI_DA_RISCALDARE.every((p) => riscaldamento.pronti.has(p) || (p === 'sala' && !salaAttiva))
-      // se il 3d è già visibile non serve più: il lavoro l’ha fatto il primo fotogramma
-      if (percorso.header.opacity > 0.001) riscaldamento.fatto = true
-      if (!pronti || riscaldamento.fatto) return
-      if (fotogrammi === 0) {
-        riscaldamento.attivo = true
-        // anche ciò che è fuori inquadratura: programmi compilati e texture sulla gpu
-        gl.compile(scene, camera)
+      if (annullato || document.hidden) return
+      // Un salto diretto ha precedenza: la preparazione non trattiene mai ingresso o scroll.
+      if (percorso.header.opacity > 0.001) {
+        riscaldamento.attivo = false
+        riscaldamento.fatto = true
+        return
+      }
+      const nuova = [...riscaldamento.pronti].sort().join(',')
+      if (nuova !== firma && !compilando) {
+        firma = nuova
+        shader = []
         scene.traverse((o) => {
           const materiali = (o as THREE.Mesh).material
+          if (materiali) shader.push(o)
           for (const m of Array.isArray(materiali) ? materiali : materiali ? [materiali] : [])
-            for (const valore of Object.values(m)) if (valore instanceof THREE.Texture) gl.initTexture(valore)
+            for (const valore of Object.values(m)) if (valore instanceof THREE.Texture && !viste.has(valore)) {
+              viste.add(valore)
+              coda.push(valore)
+            }
         })
+        return
       }
+      // Un solo upload per tick: anche il pulsante d’ingresso può ricevere eventi tra due texture.
+      const texture = coda.shift()
+      if (texture) { gl.initTexture(texture); return }
+      if (compilando) return
+      const oggetto = shader.shift()
+      if (oggetto) {
+        // Un oggetto per tick, con le luci della scena finale e compilazione parallela se supportata.
+        compilando = true
+        void gl.compileAsync(oggetto, camera, scene).catch(() => {}).finally(() => { compilando = false })
+        return
+      }
+      const pronti = PARTI_DA_RISCALDARE.every((p) => riscaldamento.pronti.has(p) || (p === 'sala' && !salaAttiva))
+      if (!pronti || compilando) return
+      riscaldamento.attivo = true
       invalidate()
       if (++fotogrammi > 4) {
         riscaldamento.attivo = false
         riscaldamento.fatto = true
-        invalidate()
       }
     }
     gsap.ticker.add(tick)
-    return () => gsap.ticker.remove(tick)
+    return () => {
+      annullato = true
+      riscaldamento.attivo = false
+      gsap.ticker.remove(tick)
+    }
   }, [gl, scene, camera, invalidate])
   return null
 }
@@ -170,6 +226,7 @@ function VoltoAnimato({
 }: Pick<Props, 'riferimento' | 'controllo'> & { modello: THREE.Group }) {
   const { umore, ascoltaAzioni } = useVolto()
   const gruppo = useRef<THREE.Group>(null)
+  const hostRef = useRef<HTMLElement | null>(null)
   const { camera, size } = useThree()
   const azioni = useRef({ battito: -10, occhiolino: -10, sorriso: -10 })
   const stato = useRef({
@@ -246,14 +303,17 @@ function VoltoAnimato({
     const ora = performance.now() / 1000,
       s = stato.current,
       a = azioni.current
-    const host = document.querySelector<HTMLElement>('[data-logo-continuo]')
+    const host = (hostRef.current ??= document.querySelector<HTMLElement>('[data-logo-continuo]'))
     if (host) {
-      host.dataset.fase = posa.fase
-      host.dataset.umore = umore
-      host.dataset.apertura = String(s.aperture[0])
-      host.style.opacity = String(posa.opacity)
-      if (effettoAttivo('grana')) document.documentElement.toggleAttribute('data-grana-webgl', posa.opacity > 0.5)
-      host.style.zIndex = '10'
+      if (host.dataset.fase !== posa.fase) host.dataset.fase = posa.fase
+      if (host.dataset.umore !== umore) host.dataset.umore = umore
+      const apertura = s.aperture[0].toFixed(3)
+      if (host.dataset.apertura !== apertura) host.dataset.apertura = apertura
+      const opacity = String(posa.opacity)
+      if (host.style.opacity !== opacity) host.style.opacity = opacity
+      const grana = posa.opacity > 0.5 && effettoAttivo('grana')
+      if (document.documentElement.hasAttribute('data-grana-webgl') !== grana)
+        document.documentElement.toggleAttribute('data-grana-webgl', grana)
     }
     g.visible = (posa.opacity > 0.001 || (riscaldamento.attivo && !riferimento)) && !document.hidden
     if (!g.visible) return
@@ -368,8 +428,9 @@ function PianificatoreGlitch() {
   const invalidate = useThree((s) => s.invalidate)
   useEffect(() => avviaGlitch(), [])
   useEffect(() => {
+    const richiedi = limitaFrame(invalidate)
     const tick = () => {
-      if (glitch.attivo && !document.hidden) invalidate()
+      if (glitch.attivo) richiedi()
     }
     gsap.ticker.add(tick)
     return () => gsap.ticker.remove(tick)

@@ -60,7 +60,8 @@ sorgenti/progetti/*
 src/content/progetti/*/_originali/*.glb
 
 # screenshot dei test e audio originali (restano sul computer)
-sorgenti/test-*/
+verifiche/risultati/
+sorgenti/computer/export/
 sorgenti/audio/*.mp3
 sorgenti/audio/*.wav
 .claude/worktrees/

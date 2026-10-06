@@ -42,7 +42,7 @@ export const movimento = {
   },
 
   computer: {
-    // scroll in cui la camera scende verso il computer a terra fino allo schermo (vh)
+    // scroll in cui la camera scende verso la postazione Macintosh fino allo schermo (vh)
     avvicinamento: 100,
     // scroll con la camera ferma davanti allo schermo acceso: qui il computer si usa (vh)
     sosta: 120,
@@ -56,7 +56,7 @@ export const movimento = {
     // quanto spazio occupa lo schermo nella sosta su desktop/tablet (frazione della vista), a computer acceso
     altezzaSchermo: 0.5,
     larghezzaSchermo: 0.6,
-    // inquadratura larga a computer spento: monitor, tastiera e mouse, vista un po’ dall’alto.
+    // inquadratura larga a computer spento: scrivania completa, vista un po’ dall’alto.
     // Al clic la camera entra verso lo schermo (percorso.computer.zoom 0 → 1, animato da GSAP, non dallo scroll)
     larga: {
       // gradi sopra l’orizzonte e di lato (positivo = da destra)
@@ -64,9 +64,9 @@ export const movimento = {
       lato: 0,
       // frazione della vista occupata dall’insieme (desktop/tablet, telefono)
       riempie: { larghezza: 0.9, altezza: 0.82 },
-      riempieTelefono: { larghezza: 1.05, altezza: 0.6 },
-      // spazio sopra il monitor per il volto che sporge (unità del modello, il monitor è alto ≈ 0,59)
-      testa: 0.22,
+      riempieTelefono: { larghezza: 0.9, altezza: 0.72 },
+      // spazio sopra il Macintosh per il volto che sporge (unità del modello, il monitor è alto ≈ 0,43)
+      testa: 0.16,
     },
     zoom: { durata: 2.2, ease: 'power2.inOut' },
     // impulso del mouse 3d che invita ad accendere (s) e intensità massima del bagliore
@@ -77,7 +77,7 @@ export const movimento = {
       fattore: 1.25,
       // nascosto si allontana dietro il monitor e, visto da qui, resta più stretto del monitor
       fattoreNascosto: 0.86,
-      // spazio tra il retro del monitor e il volto (unità della scena; il monitor è profondo ≈ 2,3)
+      // spazio tra il retro del Macintosh e il volto (unità della scena)
       distacco: 0.5,
       // tratto dell’avvicinamento (0–1) in cui il volto lascia il centro e va dietro il monitor
       versoDa: 0.3,

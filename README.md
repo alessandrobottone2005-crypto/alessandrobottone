@@ -4,8 +4,8 @@ Portfolio one-page in italiano, raccontato dallo scroll. Il volto parte come seg
 
 **preloader → header → portfolio → chi sono → contatti**
 
-- Header con quattro discipline; il nome grande si raccoglie in alto a destra e resta cliccabile per tornare all’inizio.
-- Portfolio dentro un computer retrò appoggiato a terra in una sala di cemento realistica (luce cotta in Blender, pavimento bagnato che riflette, polvere nel fascio di sole): la camera scende fino allo schermo, il computer si accende e si usa. L’interfaccia riprende il Finder del Macintosh 1984 (bianco e nero, ChicagoFLF): quattro cartelle per disciplina, un documento per progetto, finestre con copertina a colori, informazioni e blocchi. Il volto metallico sta dietro il monitor, gioca a nascondino e reagisce a cartelle e progetti.
+- Header con tre discipline attive; il nome grande si raccoglie in alto a destra e resta cliccabile per tornare all’inizio.
+- Portfolio dentro una postazione Macintosh 128K con scrivania e accessori in una sala di cemento realistica (luce cotta in Blender, pavimento bagnato che riflette, polvere nel fascio di sole): la camera scende fino allo schermo, il computer si accende e si usa. L’interfaccia riprende il Finder del Macintosh 1984 (bianco e nero, ChicagoFLF): una cartella per disciplina attiva, un documento per progetto, finestre con copertina a colori, informazioni e blocchi. Il volto metallico sta dietro il monitor, gioca a nascondino e reagisce a cartelle e progetti.
 - Biografia invariata, rivelata parola per parola; a sinistra il logo si trasforma in un avatar a punti che segue il cursore; contatti con logo grande, Instagram, Behance, email e copyright.
 
 La stessa esperienza 3d è presente su mobile. Su telefono l’interfaccia occupa tutta la vista. Con movimento ridotto: SVG statici, scroll nativo e computer già acceso in una scena ferma. In caso di errore WebGL restano il volto SVG e l’interfaccia del computer. Progetti pubblicati: dai tre fuochi, lorenzo e serena brancale (branding); arabian sunset, donne selvagge, don’t look medusa, dove la guerra non arriva e inktober (illustrazione); cuphead e mugman · art toys (3d).
@@ -33,7 +33,7 @@ In sviluppo [laboratorio](http://localhost:5173/laboratorio) permette di provare
 | `npm run lint` | controllo del codice con Oxlint |
 | `npm run nuovo-progetto` | crea una cartella e un JSON iniziale non pubblicato |
 | `npm run prepara-progetti` | ottimizza immagini/copertine/GLB e controlla i file dei progetti |
-| `npm run prepara-computer` | rigenera `public/computer/computer.glb` dall’originale in `sorgenti/computer/` |
+| `npm run prepara-computer` | prepara la postazione Macintosh, il GLB web e le misure del vetro dall’originale in `sorgenti/computer/originali/` |
 | `npm run prepara-sala` | rigenera `public/sala/` dall’esportazione Blender in `sorgenti/sala/export/` |
 | `npm run genera-favicon` | rigenera favicon sveglia, addormentata e icona iOS |
 | `npm run genera-og` | rigenera l’immagine social; richiede Outfit TTF installato sul computer |
@@ -55,13 +55,13 @@ In sviluppo [laboratorio](http://localhost:5173/laboratorio) permette di provare
 | progetti | `src/content/progetti/<slug>/`; [guida pratica](docs/come-aggiungere-un-progetto.md) |
 | meta e indirizzi social del sito | `index.html` |
 
-Scrivere i testi in minuscolo con apostrofi tipografici (’). Gli originali creativi si conservano in `sorgenti/`; soltanto le versioni runtime necessarie stanno in `public/`.
+Scrivere i testi in minuscolo con apostrofi tipografici (’). Gli originali creativi si conservano in `sorgenti/`; soltanto le versioni runtime necessarie stanno in `public/`. Gli strumenti browser sono in `scripts/verifiche/`, screenshot e report in `verifiche/risultati/` (fuori da Git). Indici: [cartelle e responsabilità](docs/architettura.md), [sorgenti](sorgenti/README.md), [strumenti](scripts/README.md), [controlli](verifiche/README.md).
 
 ## pubblicazione
 
 Repository: [alessandrobottone](https://github.com/alessandrobottone2005-crypto/alessandrobottone) (prima `ProvaLandingPagePortfolio_Claude`, GitHub reindirizza il vecchio indirizzo). Progetto Vercel: `alessandrobottone`, ambiente Node 24/Vite. Dominio: [alessandrobottone.vercel.app](https://alessandrobottone.vercel.app); il vecchio `provalandingpageportfolio-claude.vercel.app` resta attivo.
 
-Dal 1 ottobre 2026 il lavoro sta su `main` (dove è stato fuso `prova/computer-retro`); `codex/manutenzione-portfolio-3d` è il branch storico del 29 settembre. Lo stato del deploy, la versione e i controlli online si trovano in [pubblicazione](docs/pubblicazione.md). I crediti del computer e della sala sono ancora segnaposto: pubblicati così per scelta di alessandro, da completare in `src/config/sito.ts`. Il push di un branch e il deploy in produzione sono operazioni distinte. La configurazione mantiene il refresh delle rotte `/progetti/<slug>`.
+`main` è il ramo di produzione; incorpora il lavoro sul computer, audio e app della scrivania tramite i merge documentati in `docs/pubblicazione.md`; `codex/manutenzione-portfolio-3d` è il branch storico del 29 settembre. Lo stato del deploy, la versione e i controlli online si trovano in [pubblicazione](docs/pubblicazione.md). Dal 6 ottobre 2026 i crediti della sala e della nuova postazione Macintosh sono completi in `src/config/sito.ts`; il PC precedente e il Macintosh Classic alternativo sono stati eliminati su richiesta. La postazione con scrivania è l’unico computer conservato; lo stato della pubblicazione è in `docs/pubblicazione.md`. Il push di un branch e il deploy in produzione sono operazioni distinte. La configurazione mantiene il refresh delle rotte `/progetti/<slug>`.
 
 ## documentazione
 
@@ -77,6 +77,23 @@ Dal 1 ottobre 2026 il lavoro sta su `main` (dove è stato fuso `prova/computer-r
 | [accessibilità e prestazioni](docs/accessibilita-prestazioni.md) | tastiera, movimento ridotto, fallback e limiti delle misure |
 | [pubblicazione](docs/pubblicazione.md) | GitHub, Vercel, asset pubblici e verifiche |
 | [sorgenti Blender](sorgenti/logo-3d/README.md) | scene, controlli, rigenerazione e licenze |
-| [sorgenti del computer](sorgenti/computer/README.md) | modello, rigenerazione e licenza da completare |
-| [sorgenti della sala](sorgenti/sala/README.md) | scena Blender, cottura, rigenerazione e licenza da completare |
+| [sorgenti del computer](sorgenti/computer/README.md) | postazione Macintosh, originali, rigenerazione e licenze |
+| [sorgenti della sala](sorgenti/sala/README.md) | scena Blender, cottura, rigenerazione e licenza |
 | [CLAUDE.md](CLAUDE.md) | brief operativo e storico delle decisioni |
+
+
+### navbar e verifica mobile (5 ottobre 2026)
+
+Tre collegamenti persistenti dopo l’ingresso, salto al computer già acceso, ottimizzazioni del nome e della qualità adattiva, preparazione progressiva di shader/texture. [Comportamento, verifiche e misure](docs/navbar-mobile.md).
+
+- `npm run verifica-navigazione -- http://127.0.0.1:4173/`: flussi su build di produzione locale, tastiera, rotazione, rete lenta e WebGL assente.
+- `npm run misura-fluidita -- http://127.0.0.1:4173/ telefono`: attiva l’ingresso, verifica lo scroll, misura separatamente ingresso e percorso; `MISURA_OUTPUT=/percorso/risultato.json` salva i campioni.
+- `npm run diagnostica-luce -- http://127.0.0.1:4173/`: fotografie comparative con esclusioni solo diagnostiche.
+
+Gli strumenti usano Node e Google Chrome già installato su macOS; non installano dipendenze.
+
+### postazione Macintosh (6 ottobre 2026)
+
+Scrivania completa da `ScrivaniaComputer.glb` di kreems, CC BY 4.0, con marchi rimossi e CRT collegato al Finder. GLB web 1,06 MiB (1,11 MB decimali); originali e guida in [sorgenti del computer](sorgenti/computer/README.md). `npm run verifica-computer` controlla asset, accensione, viewport e fallback e salva anteprime locali.
+
+Per misurare anche il ritorno davanti al Finder già acceso: `npm run misura-fluidita -- http://127.0.0.1:4173/ --computer-acceso` (aggiungere `telefono` prima del flag per il viewport mobile con CPU 4×).

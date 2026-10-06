@@ -38,9 +38,16 @@ export class EffettoColore extends Effect {
         float distanza = abs(fract(h.x - tonalita + .5) - .5);
         // colore reale (massimo − minimo dei canali), non la saturazione relativa: i grigi scuri appena caldi restano grigi
         float croma = max(c.r, max(c.g, c.b)) - min(c.r, min(c.g, c.b));
-        float tieni = (1. - smoothstep(ampiezza * .6, ampiezza, distanza)) * smoothstep(.12, .26, croma);
+        // AgX riduce il croma delle alte luci: una soglia assoluta le rendeva
+        // grigie prima del centro arancione, producendo una frangia chiara.
+        // Mantieni i grigi scuri neutri e allarga gradualmente la soglia solo in luce.
+        float luce = smoothstep(.35, .8, l);
+        float tieni = (1. - smoothstep(ampiezza * .6, ampiezza, distanza))
+          * smoothstep(mix(.12, .015, luce), mix(.26, .08, luce), croma);
         vec3 grigio = mix(vec3(ln), c * (ln / max(l, 1e-4)), saturazione);
-        vec3 colorato = c * (ln / max(l, 1e-4));
+        // Limita insieme i canali per conservare la tonalità se il guadagno supera 1.
+        float guadagno = min(ln / max(l, 1e-4), 1. / max(max(c.r, max(c.g, c.b)), 1e-4));
+        vec3 colorato = c * guadagno;
         outputColor = vec4(clamp(mix(grigio, colorato, tieni), 0., 1.), inputColor.a);
       }`,
       {

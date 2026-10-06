@@ -117,11 +117,11 @@ export function ChiSono() {
   )
 
   return (
-    <section id="chi-sono" aria-labelledby="titolo-chi-sono" className="relative z-20">
+    <section tabIndex={-1} id="chi-sono" aria-labelledby="titolo-chi-sono" className="relative z-20">
       <h2 id="titolo-chi-sono" className="sr-only">
         {sito.sezioni.chiSono}
       </h2>
-      <div ref={palco} className="flex min-h-svh items-center px-4 py-12 md:px-8 md:py-16 lg:px-12">
+      <div ref={palco} className="flex min-h-svh items-center px-4 pt-[var(--nav-bottom)] pb-12 md:px-8 md:py-24 lg:px-12">
         {/* telefono: avatar centrato sopra il testo; da 768px avatar a sinistra e testo a destra */}
         <div className="grid w-full grid-cols-1 items-center gap-6 md:grid-cols-12 md:gap-8">
           <div

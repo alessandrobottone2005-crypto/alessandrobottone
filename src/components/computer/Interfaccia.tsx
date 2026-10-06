@@ -33,6 +33,8 @@ export default function Interfaccia({ modo }: { modo: 'percorso' | 'ridotto' }) 
   const [finderMontato, setFinderMontato] = useState(false)
   const angoli = useRef<number[]>([])
   const misuraRef = useRef(misura)
+  const attivaRef = useRef(attiva)
+  const ultimaPosa = useRef('')
 
   // risoluzione dell’interfaccia = misura in pixel del vetro nella sosta (su telefono, la vista intera)
   useLayoutEffect(() => {
@@ -44,6 +46,8 @@ export default function Interfaccia({ modo }: { modo: 'percorso' | 'ridotto' }) 
       // su telefono la camera supera la cornice: anche nella scena ferma l’interfaccia occupa la vista
       const tel = telefono(w)
       const m = tel ? { larghezza: w, altezza: h, telefono: true } : { ...misuraSosta(w, h), telefono: false }
+      const precedente = misuraRef.current
+      if (precedente.larghezza === m.larghezza && precedente.altezza === m.altezza && precedente.telefono === m.telefono) return
       misuraRef.current = m
       setMisura(m)
     }
@@ -71,6 +75,9 @@ export default function Interfaccia({ modo }: { modo: 'percorso' | 'ridotto' }) 
     const s = modo === 'ridotto' ? 1 : percorso.stazione
     const zoom = modo === 'ridotto' ? 1 : percorso.computer.zoom
     const m = misuraRef.current
+    const firma = `${w},${h},${s},${zoom},${m.larghezza},${m.altezza}`
+    if (firma === ultimaPosa.current) return
+    ultimaPosa.current = firma
     const q = angoli.current
     const vicino = s > 0.5 && s < 1.8 && proiettaSchermo(s, w, h, q, zoom)
     let opacita = vicino ? 1 : 0
@@ -84,12 +91,21 @@ export default function Interfaccia({ modo }: { modo: 'percorso' | 'ridotto' }) 
     }
     const visibilita = opacita > 0.001 ? 'visible' : 'hidden'
     // lo schermo compare o sparisce sotto un mouse fermo: il cursore del sito deve saperlo
-    if (el.style.visibility !== visibilita) requestAnimationFrame(ricalcolaCursore)
-    el.style.visibility = visibilita
-    el.style.opacity = String(opacita)
-    if (vicino) el.style.transform = omografia(m.larghezza, m.altezza, q)
+    if (el.style.visibility !== visibilita) {
+      el.style.visibility = visibilita
+      requestAnimationFrame(ricalcolaCursore)
+    }
+    const opacity = String(opacita)
+    if (el.style.opacity !== opacity) el.style.opacity = opacity
+    if (vicino) {
+      const transform = omografia(m.larghezza, m.altezza, q)
+      if (el.style.transform !== transform) el.style.transform = transform
+    }
     const ora = modo === 'ridotto' || (s > 0.995 && s < 1.02 && zoom > 0.999)
-    setAttiva((a) => (a === ora ? a : ora))
+    if (attivaRef.current !== ora) {
+      attivaRef.current = ora
+      setAttiva(ora)
+    }
   }, [modo])
 
   // la scena 3d chiama `aggiorna` prima di disegnare; senza scena ci pensa il ticker

@@ -36,6 +36,7 @@ export function Portfolio() {
   return (
     <section
       id="portfolio"
+      tabIndex={-1}
       aria-labelledby="titolo-portfolio"
       className={`relative z-20 ${ridotto ? '' : '-mt-[100svh]'}`}
     >
@@ -171,7 +172,11 @@ function useZoom() {
     } else if (fase === 'avvio' && era === 'spento') {
       tweenZoom?.kill()
       tweenZoom = gsap.to(c, { zoom: 1, duration: C.zoom.durata, ease: C.zoom.ease })
-    } else if (fase === 'acceso' && !zoomInCorso()) c.zoom = 1
+    } else if (fase === 'acceso') {
+      tweenZoom?.kill()
+      tweenZoom = null
+      c.zoom = 1
+    }
   }, [fase])
 }
 

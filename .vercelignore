@@ -1,6 +1,7 @@
 # sorgenti creative, documentazione e strumenti locali: fuori dall'upload di deploy
 sorgenti/**
 docs/**
+verifiche/**
 CLAUDE.md
 README.md
 .claude/**
@@ -28,5 +29,9 @@ dist/**
 dist-ssr/**
 node_modules/**
 *.log
+
+# strumenti browser: esclusi dal deploy; i preparatori restano per manutenzione
+scripts/verifiche/**
+scripts/lib/**
 
 # scripts/valida-progetti.ts e config restano disponibili per la build Vite

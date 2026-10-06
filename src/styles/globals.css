@@ -233,3 +233,44 @@ html.cursore-personalizzato * {
 html[data-grana-webgl] .grana {
   opacity: 0;
 }
+
+/* Navigazione disponibile dopo il gesto d’ingresso, fuori dai contenitori con pin. */
+ :root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --nav-bottom: calc(var(--safe-top) + 136px);
+}
+.navigazione-sezioni {
+  position: fixed;
+  z-index: 41;
+  top: calc(var(--safe-top) + 80px);
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  color: var(--color-bianco);
+}
+.navigazione-sezioni a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 12px;
+  border-radius: 2px;
+  background: rgb(20 20 20 / .8);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background .2s, color .2s, box-shadow .2s;
+}
+.navigazione-sezioni a:hover,
+.navigazione-sezioni a:focus-visible {
+  background: var(--color-bianco);
+  color: var(--color-nero);
+  box-shadow: var(--shadow-bagliore);
+}
+.ritorno-inizio { top: calc(var(--safe-top) + 20px); right: max(16px, env(safe-area-inset-right)); }
+@media (min-width: 768px) {
+  :root { --nav-bottom: calc(var(--safe-top) + 88px); }
+  .navigazione-sezioni { top: calc(var(--safe-top) + 24px); left: max(24px, env(safe-area-inset-left)); right: auto; justify-content: flex-start; }
+  .ritorno-inizio { top: calc(var(--safe-top) + 28px); right: max(28px, env(safe-area-inset-right)); }
+}

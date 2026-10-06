@@ -17,8 +17,14 @@ function imposta(nuova: Fase) {
 
 /** accensione: la prima volta l’avvio completo, poi uno breve; `subito` salta l’avvio (link diretto, movimento ridotto) */
 export function accendi(subito = false) {
+  if (subito) {
+    avviato = true
+    percorso.computer.zoom = 1
+    imposta('acceso')
+    return
+  }
   if (fase !== 'spento') return
-  imposta(subito ? 'acceso' : 'avvio')
+  imposta('avvio')
 }
 export function fineAvvio() {
   avviato = true

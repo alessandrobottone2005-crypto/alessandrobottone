@@ -19,7 +19,7 @@ Passi di `prepara_sala.py` (si possono lanciare anche uno alla volta):
 - `cuoci`: luce diffusa (diretta + rimbalzi) cotta su pareti (4096) e pavimento (2048), ripulita con OIDN.
 - `esporta`: `export/Sala_Web.glb` (UV0 cemento, UV1 luce) e lightmap in PNG con un fattore comune salvato in `stazioni.json`.
 
-Il segnaposto del computer (cubo nascosto) sta dove la luce della fessura tocca il pavimento: lì il sito appoggia `Computer.glb`.
+Il segnaposto del computer (cubo nascosto) sta dove la luce della fessura tocca il pavimento: lì il sito appoggia la postazione Macintosh (`public/computer/computer.glb`).
 
 `export/*.exr`, `export/Sala_Web.glb` e `textures/` sono rigenerabili e non vanno su GitHub.
 
@@ -27,13 +27,8 @@ Il segnaposto del computer (cubo nascosto) sta dove la luce della fessura tocca 
 
 Cemento di pareti e pavimento: pacchetto «Modular Concrete Interior» in `sorgenti/ambiente/assets_online/` (CC0, texture da texturehaven.com e cc0textures.com).
 
-## licenza — da completare
+## licenza
 
-Provenienza di `Ambiente.glb` sconosciuta (1 ottobre 2026). Lo stile (luce cotta, finto specchio, esportazione Sketchfab) è molto simile ai modelli di **abhayexe** su Sketchfab, alcuni CC BY 4.0 e altri «Free Standard», ma nessuno ha lo stesso numero di triangoli (≈ 2.100):
+`Ambiente.glb` proviene da Sketchfab: **[Brutalism Scene Baked](https://sketchfab.com/3d-models/brutalism-scene-baked-93ba334484ca44058f6dde30a3d4f066)** dell’autore **[abhayexe](https://sketchfab.com/abhayexe)** (pubblicato il 13 maggio 2026, 2.100 triangoli). Licenza: **Free Standard** (uso con attribuzione).
 
-- [Brutalist Interior [Baked]](https://sketchfab.com/3d-models/brutalist-interior-baked-d1d02e42a87b41b18bd9bf4939f490a5) — CC BY 4.0
-- [VR Room [Light Baked]](https://sketchfab.com/3d-models/vr-room-light-baked-4e4659da1542490dbfa3b3ca0d6bfd05) — CC BY 4.0
-- [Brutalist Concrete Interior VR room | Baked](https://sketchfab.com/3d-models/brutalist-concrete-interior-vr-room-baked-2f520ab03fc649c0989c3aa1d3207349) — Free Standard
-- [Brutalist Interior VR room [Baked]](https://sketchfab.com/3d-models/brutalist-interior-vr-room-baked-7781b7f1cfde42dabc613a5522f4d2b0) — Free Standard
-
-Il 1 ottobre 2026 alessandro ha scelto di pubblicare comunque il sito con il credito segnaposto (rischio accettato). Da fare appena possibile: ritrovare la pagina esatta, scrivere autore, link e licenza in `src/config/sito.ts` (`computer.crediti.ambiente` e `ambienteLink`, visibili in «informazioni» nel computer) e aggiornare questa sezione. Finché mancano, la build avvisa.
+I crediti ufficiali con il link sono registrati in `src/config/sito.ts` (`sito.computer.crediti.ambiente` e `ambienteLink`) e compaiono nella finestra «informazioni» del computer nel portfolio.

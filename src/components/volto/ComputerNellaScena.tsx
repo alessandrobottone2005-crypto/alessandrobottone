@@ -1,4 +1,4 @@
-// Computer.glb poggiato sul pavimento della sala, nel fascio di luce della fessura. Il vetro si illumina all’accensione;
+// Postazione Macintosh poggiata sul pavimento della sala, nel fascio di luce della fessura. Il vetro si illumina all’accensione;
 // l’interfaccia vera è DOM posato sopra lo schermo (components/computer/Interfaccia.tsx).
 // Spento, con la camera ferma, il mouse si illumina appena a impulsi: invita a cliccare per accendere.
 import { useFrame, useThree } from '@react-three/fiber'
@@ -6,26 +6,28 @@ import { riscaldamento } from './riscaldamento'
 import { use, useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 import { movimento } from '@/config/movimento'
-import { matriceComputer, MOUSE, VETRO } from '@/components/computer/inquadratura'
+import { matriceComputer, matriceVetro, MOUSE, VETRO } from '@/components/computer/inquadratura'
 import { accendibile, dallaScena, leggiFase } from '@/components/computer/stato'
 import { caricaComputer } from './modelloComputer'
 
-const larghezza = VETRO.destra - VETRO.sinistra
-const altezza = VETRO.alto - VETRO.basso
 const INVITO = movimento.computer.invito
 
 /**
- * Guscio del mouse: i triangoli della mesh «keyboard2» (tastiera e mouse sono una sola mesh) che cadono
- * nell’ingombro del mouse, appena gonfiati, con un materiale additivo bianco che pulsa. Nello spazio del modello.
+ * Guscio del mouse: triangoli nelle parti misurate prima dell’ottimizzazione (guscio, pulsante, fondo).
+ * Il join del GLB può cambiare i nomi delle mesh: si selezionano nello spazio della postazione.
  */
 function guscioDelMouse(scena: THREE.Object3D) {
   scena.updateMatrixWorld(true)
-  const dentro = new THREE.Box3(MOUSE.min, MOUSE.max).expandByScalar(0.01)
+  const dentro = new THREE.Box3(MOUSE.min, MOUSE.max).expandByScalar(0.001)
+  const ingombro = new THREE.Box3()
   const punti: number[] = []
   const v = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()]
   const centro = new THREE.Vector3()
   scena.traverse((o) => {
-    if (!(o instanceof THREE.Mesh) || !/keyboard/i.test(o.name)) return
+    if (!(o instanceof THREE.Mesh)) return
+    o.geometry.computeBoundingBox()
+    ingombro.copy(o.geometry.boundingBox!).applyMatrix4(o.matrixWorld)
+    if (!dentro.intersectsBox(ingombro)) return
     const pos = o.geometry.getAttribute('position') as THREE.BufferAttribute
     const indice = o.geometry.getIndex()
     const n = indice ? indice.count : pos.count
@@ -75,13 +77,13 @@ export function ComputerNellaScena({ fermo = false }: { fermo?: boolean }) {
     if (scena) gl.shadowMap.needsUpdate = true
   }, [gl, scena])
   const vetro = useMemo(() => {
-    const geometria = new THREE.PlaneGeometry(larghezza, altezza)
+    const geometria = new THREE.PlaneGeometry(VETRO.larghezza, VETRO.altezza)
     // Bagliore del tubo: bianco caldo dei fosfori, appena sopra la soglia del Bloom così la cornice ne riceve l’alone.
     const materiale = new THREE.MeshBasicMaterial({ color: '#e7e1d1', transparent: true, opacity: 0, toneMapped: false })
     materiale.color.multiplyScalar(1.35)
     const mesh = new THREE.Mesh(geometria, materiale)
-    mesh.position.set(VETRO.x - 0.002, (VETRO.alto + VETRO.basso) / 2, (VETRO.sinistra + VETRO.destra) / 2)
-    mesh.rotation.y = -Math.PI / 2
+    mesh.matrixAutoUpdate = false
+    mesh.matrix.copy(matriceVetro)
     return mesh
   }, [])
   const guscio = useMemo(() => (scena && !fermo ? guscioDelMouse(scena) : null), [scena, fermo])
@@ -93,9 +95,9 @@ export function ComputerNellaScena({ fermo = false }: { fermo?: boolean }) {
     [guscio],
   )
   const luce = useMemo(() => {
-    // Luce dello schermo sulla tastiera e sul pavimento.
+    // Luce dello schermo sulla tastiera e sulla scrivania, davanti al piano condiviso del vetro.
     const l = new THREE.PointLight('#efe7d4', 0, 3, 2)
-    l.position.set(VETRO.x - 0.35, (VETRO.alto + VETRO.basso) / 2, (VETRO.sinistra + VETRO.destra) / 2)
+    l.position.copy(VETRO.centro).addScaledVector(VETRO.normale, 0.2)
     return l
   }, [])
   useEffect(

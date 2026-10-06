@@ -20,7 +20,7 @@ function giaVisitato() {
 }
 
 export function Preloader() {
-  const { setPronto, entrato, voltoHeader } = useAvvio()
+  const { setPronto, setPreparaScena, entrato, voltoHeader } = useAvvio()
   const [finito, setFinito] = useState(false)
   const [stato, setStato] = useState<StatoVolto>('dorme')
   const radice = useRef<HTMLDivElement>(null)
@@ -70,6 +70,10 @@ export function Preloader() {
           gsap.to(radice.current, { opacity: 0, duration: movimento.durata.ridotta, onComplete: chiudi })
           return
         }
+
+        // Le risorse iniziali sono pronte: la GPU lavora durante l’uscita del preloader.
+        // Il pulsante d’ingresso mantiene i suoi tempi e non aspetta sala o computer.
+        setPreparaScena(true)
 
         const tl = gsap.timeline({ onComplete: chiudi })
         // il sito si sveglia: occhi aperti, poi il battito (con gli occhi ancora chiusi il volto lo ignorerebbe)

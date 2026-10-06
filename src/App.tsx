@@ -8,11 +8,9 @@ import { LogoContinuo } from './components/volto/LogoContinuo'
 import { Grana } from './components/effetti/Grana'
 import { useAvvio } from './components/preloader/AvvioContext'
 import { Preloader } from './components/preloader/Preloader'
-import { accendi } from './components/computer/stato'
-import { movimento } from './config/movimento'
 import { ScrollTrigger } from './lib/gsap'
 import { trovaProgetto } from './lib/progetti'
-import { aggiornaDopoCaricamento, avviaScroll, getLenis } from './lib/scroll'
+import { aggiornaDopoCaricamento, avviaScroll, tornaA } from './lib/scroll'
 import { RotteModali } from './router'
 import { ChiSono } from './sections/ChiSono/ChiSono'
 import { Contatti } from './sections/Contatti/Contatti'
@@ -38,17 +36,7 @@ export default function App() {
     if (!pronto) return
     ScrollTrigger.refresh()
     if (pathname.startsWith('/progetti/') && trovaProgetto(pathname.split('/')[2])) {
-      const computer = ScrollTrigger.getById('portfolio-computer')
-      if (computer) {
-        // a metà della sosta, su tutti i dispositivi
-        const { avvicinamento, sosta } = movimento.computer
-        const y = computer.start + (avvicinamento + sosta / 2) * (innerHeight / 100)
-        const lenis = getLenis()
-        if (lenis) lenis.scrollTo(y, { immediate: true, force: true })
-        else scrollTo(0, y)
-        computer.getTween()?.progress(1)
-        accendi(true)
-      } else document.getElementById('portfolio')?.scrollIntoView()
+      tornaA('portfolio')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pronto])

@@ -40,7 +40,7 @@ export function Contatti() {
             duration: ridotto ? movimento.durata.ridotta : movimento.durata.standard,
             stagger: ridotto ? 0 : 0.08,
             ease: movimento.ease.entrata,
-            scrollTrigger: { trigger: sezione.current, start: 'top 65%', toggleActions: 'play none none reverse' },
+            scrollTrigger: { id: 'contatti-ingresso', trigger: sezione.current, start: 'top 65%', toggleActions: 'play none none reverse' },
           },
         )
       })
@@ -82,6 +82,7 @@ export function Contatti() {
   return (
     <section
       id="contatti"
+      tabIndex={-1}
       ref={sezione}
       aria-labelledby="titolo-contatti"
       className="relative flex min-h-svh flex-col items-center justify-center gap-[max(3rem,9svh)] px-4 pt-24 pb-[max(3rem,env(safe-area-inset-bottom))] md:px-8"

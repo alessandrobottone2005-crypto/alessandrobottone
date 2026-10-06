@@ -11,6 +11,7 @@
     "nuovo-progetto": "node scripts/nuovo-progetto.mjs",
     "prepara-progetti": "node scripts/prepara-progetti.mjs",
     "prepara-computer": "node scripts/prepara-computer.mjs",
+    "verifica-computer": "node scripts/verifiche/verifica-computer.mjs",
     "prepara-sala": "node scripts/prepara-sala.mjs",
     "foto-palette": "node scripts/foto-palette.mjs",
     "prepara-avatar": "node scripts/prepara-avatar.mjs",
@@ -19,8 +20,10 @@
     "genera-og": "node scripts/genera-og.mjs",
     "genera-nome-3d": "node scripts/genera-nome-3d.mjs",
     "comprimi-pdf": "swift scripts/comprimi-pdf.swift",
-    "misura-fluidita": "node scripts/misura-fluidita.mjs",
-    "prepara-audio": "node scripts/prepara-audio.mjs"
+    "misura-fluidita": "node scripts/verifiche/misura-fluidita.mjs",
+    "prepara-audio": "node scripts/prepara-audio.mjs",
+    "verifica-navigazione": "node scripts/verifiche/verifica-navigazione.mjs",
+    "diagnostica-luce": "node scripts/verifiche/diagnostica-luce.mjs"
   },
   "dependencies": {
     "@fontsource-variable/outfit": "^5.3.0",

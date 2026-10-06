@@ -11,6 +11,7 @@ import { sguardo } from '@/components/volto/sguardo'
 import { gsap } from '@/lib/gsap'
 import { media } from '@/config/movimento'
 import { caricaFontNome } from './fontNome'
+import { limitaFrame, qualita } from '@/components/volto/qualita'
 
 // letture delle preferenze create una volta (si aggiornano da sole)
 const mouse = matchMedia(media.mouse)
@@ -32,19 +33,31 @@ export default function Nome3D({ radice }: { radice: RefObject<HTMLElement | nul
   return (
     <Canvas
       frameloop="demand"
-      dpr={[1, 1.5]}
+      dpr={qualita.valori.dpr}
       camera={{ fov: CAMPO, position: [0, 0, DISTANZA], near: 0.1, far: 200 }}
       gl={{ antialias: true, alpha: true, toneMapping: THREE.AgXToneMapping }}
       onCreated={({ gl }) => (gl.localClippingEnabled = true)}
       style={{ pointerEvents: 'none' }}
       aria-hidden="true"
     >
+      <QualitaNome />
       <Ambiente />
       <directionalLight position={[-4, 6, 6]} intensity={2.2} />
       <directionalLight position={[5, -2, 4]} intensity={0.6} />
       <Lettere radice={radice} font={font} modello={modello.scene} />
     </Canvas>
   )
+}
+
+function QualitaNome() {
+  const setDpr = useThree((s) => s.setDpr)
+  const invalidate = useThree((s) => s.invalidate)
+  useEffect(() => {
+    const aggiorna = () => { setDpr(qualita.valori.dpr); invalidate() }
+    aggiorna()
+    return qualita.ascolta(aggiorna)
+  }, [setDpr, invalidate])
+  return null
 }
 
 /** riflessi neutri generati in codice, nessuna hdri da scaricare */
@@ -115,7 +128,7 @@ function Lettere({ radice, font, modello }: { radice: RefObject<HTMLElement | nu
       materiale.customProgramCacheKey = () => 'nome-3d'
       const piano = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
       materiale.clippingPlanes = [piano]
-      return { el, ...g, materiale, piano }
+      return { el, base: el.querySelector<HTMLElement>('[data-base]'), ...g, materiale, piano }
     })
     // oxlint-disable-next-line react/preserve-manual-memoization
   }, [radice, font, modello])
@@ -133,45 +146,74 @@ function Lettere({ radice, font, modello }: { radice: RefObject<HTMLElement | nu
   // essere cambiato: scroll, ridimensionamento, cursore, animazioni gsap delle lettere (più 1,5s di coda per lo scrub)
   useEffect(() => {
     let firma = ''
+    let sporco = true
+    const richiedi = limitaFrame(invalidate)
     let fontPx = 0
+    let stilePrecedente = ''
+    const larghezze = new Map<HTMLElement, number>()
+    const parole = [...(radice.current?.querySelectorAll<HTMLElement>('[data-parola-nome]') ?? [])]
     let finoA = performance.now() + 4000
+    const elementi = lettere.map((l) => l.el)
     const sveglia = () => (finoA = performance.now() + 1500)
+    const puntatore = () => { if (mouse.matches && normale.matches) sporco = true }
     const ridimensiona = () => {
       fontPx = 0
+      stilePrecedente = ''
+      larghezze.clear()
       sveglia()
     }
     addEventListener('resize', ridimensiona)
     addEventListener('scroll', sveglia, { passive: true })
-    addEventListener('pointermove', sveglia, { passive: true })
+    addEventListener('pointermove', puntatore, { passive: true })
+    const resize = new ResizeObserver(ridimensiona)
+    if (radice.current) resize.observe(radice.current)
+    document.fonts.ready.then(ridimensiona)
     const tick = () => {
       if (document.hidden) return
       const ora = performance.now()
-      if (ora > finoA && !inMovimento.current && !gsap.isTweening(lettere.map((l) => l.el))) return
+      if (ora > finoA && !gsap.isTweening(elementi)) {
+        if ((sporco || inMovimento.current) && richiedi()) sporco = false
+        return
+      }
+      // Nessuna misura DOM se GSAP non ha cambiato né parole né lettere.
+      const stile = parole.map((p) => p?.style.cssText).join('|') + elementi.map((e) => e.style.transform).join('|')
+      if (stile && stile === stilePrecedente) {
+        if ((sporco || inMovimento.current) && richiedi()) sporco = false
+        return
+      }
+      stilePrecedente = stile
       let nuova = ''
-      misure.current = lettere.map(({ el }) => {
+      const maschere = new Map<HTMLElement, DOMRect>()
+      misure.current = lettere.map(({ el, base }) => {
         if (!fontPx) fontPx = parseFloat(getComputedStyle(el).fontSize)
         const r = el.getBoundingClientRect()
-        const b = el.querySelector('[data-base]')?.getBoundingClientRect()
-        const m = el.parentElement?.getBoundingClientRect()
-        const ok = Boolean(b && m && el.offsetWidth)
-        const em = ok ? fontPx * (r.width / el.offsetWidth) : 0
+        const b = base?.getBoundingClientRect()
+        const genitore = el.parentElement
+        let m = genitore ? maschere.get(genitore) : undefined
+        if (genitore && !m) { m = genitore.getBoundingClientRect(); maschere.set(genitore, m) }
+        const larghezza = larghezze.get(el) ?? el.offsetWidth
+        larghezze.set(el, larghezza)
+        const ok = Boolean(b && m && larghezza)
+        const em = ok ? fontPx * (r.width / larghezza) : 0
         const misura = { x: r.left, base: b?.top ?? 0, taglio: m?.bottom ?? 0, em, ok }
         nuova += `${misura.x.toFixed(1)},${misura.base.toFixed(1)},${misura.taglio.toFixed(1)},${em.toFixed(2)};`
         return misura
       })
       const { punto, tocco } = sguardo.get()
       if (mouse.matches && !tocco && punto) nuova += `${punto.x},${punto.y}`
-      if (nuova !== firma || inMovimento.current) invalidate()
+      if (nuova !== firma || inMovimento.current) sporco = true
+      if (sporco && richiedi()) sporco = false
       firma = nuova
     }
     gsap.ticker.add(tick)
     return () => {
       gsap.ticker.remove(tick)
+      resize.disconnect()
       removeEventListener('resize', ridimensiona)
       removeEventListener('scroll', sveglia)
-      removeEventListener('pointermove', sveglia)
+      removeEventListener('pointermove', puntatore)
     }
-  }, [lettere, invalidate])
+  }, [lettere, invalidate, radice])
 
   useFrame((_, delta) => {
     const unita = (2 * DISTANZA * Math.tan(THREE.MathUtils.degToRad(CAMPO / 2))) / size.height

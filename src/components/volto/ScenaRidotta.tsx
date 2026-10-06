@@ -1,7 +1,7 @@
 // Movimento ridotto: stessa stanza e stesso computer, inquadratura ferma davanti allo schermo acceso.
 // Nessun volto, volume e polvere fermi: la scena si disegna solo quando cambia qualcosa.
 import { Canvas } from '@react-three/fiber'
-import { Suspense } from 'react'
+import { Component, Suspense, type ReactNode } from 'react'
 import * as THREE from 'three'
 import { CAMERA, CAMPO } from '@/components/computer/inquadratura'
 import { Rifinitura } from './Rifinitura'
@@ -11,7 +11,18 @@ import { Mondo } from './Mondo'
 import { PolvereNelFascio } from './PolvereNelFascio'
 import { effettoAttivo } from './cinema'
 
+class Protetta extends Component<{ children: ReactNode }, { rotto: boolean }> {
+  state = { rotto: false }
+  static getDerivedStateFromError() { return { rotto: true } }
+  componentDidCatch(errore: unknown) { console.warn('scena ferma non disponibile:', errore) }
+  render() { return this.state.rotto ? null : this.props.children }
+}
+
 export default function ScenaRidotta() {
+  return <Protetta><Scena /></Protetta>
+}
+
+function Scena() {
   return (
     <Canvas
       shadows={salaAttiva && 'percentage'}

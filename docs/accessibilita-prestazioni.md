@@ -15,7 +15,7 @@ Un errore del logo o del Canvas viene gestito da `ScenaProtetta`: volto SVG di r
 ## tastiera, touch e struttura
 
 - Focus bianco 2px con offset 4px, sempre visibile.
-- Nome fisso attivabile da tastiera per tornare all’inizio.
+- Nome fisso attivabile da tastiera per tornare all’inizio. Dopo l’ingresso sono sempre visibili i link portfolio, chi sono e contatti: altezza 48px, nessun hamburger. La navbar è fuori dai pin, con una riga sotto il nome su mobile e link a sinistra su desktop; safe area e fascia del Finder condividono `--nav-bottom`.
 - Computer: regione etichettata, `inert` finché la camera non è ferma sullo schermo acceso. Icone e voci sono pulsanti (Invio/Spazio aprono), menu con frecce ed Esc, finestre `role="dialog"` non modali; Esc chiude la finestra in primo piano e il focus torna all’icona che l’aveva aperta; aperture e chiusure annunciate con `aria-live`.
 - Video: slider con frecce, Home/End; PDF con pulsanti e contatore accessibile.
 - Contatti: hover equivalente a focus/tocco; copia email annunciata con `aria-live`.
@@ -35,9 +35,9 @@ Un errore del logo o del Canvas viene gestito da `ScenaProtetta`: volto SVG di r
 | player esterno Vimeo/YouTube | clic sul pulsante play |
 
 - Modello V2 circa 872 kB con Meshopt, texture WebP incorporate e cache condivisa; nessuna HDRI di studio scaricata dalla home.
-- Canvas unico su `demand`, aggiornato solo con scena visibile e scheda attiva; le espressioni continuano quando posizione/scala sono ferme. I modelli nelle finestre si fermano fuori vista.
-- Stessi effetti su desktop e mobile, con qualità adattiva: se i fotogrammi non reggono scendono la risoluzione interna della nebbia, del riflesso e il DPR (massimo 1,5). Non esiste un ramo mobile che elimina l’ambiente o un effetto ([ambiente 3d](ambiente-3d.md#rifinitura-post-produzione)).
-- Shader e texture preparati prima che il 3d si veda (preriscaldamento); mappa d’ombra disegnata una volta; il layout della pagina si legge solo quando serve (avatar, nome in metallo); il vetro del computer non ha filtri CSS mentre la camera scende.
+- Canvas della scena e del nome su `demand`, con richieste continue limitate a 60fps e DPR adattivo condiviso; la scena si aggiorna solo quando visibile e con scheda attiva; le espressioni continuano quando posizione/scala sono ferme. I modelli nelle finestre si fermano fuori vista.
+- Stessi effetti su desktop e mobile, con qualità adattiva: se i fotogrammi non reggono scendono la risoluzione interna della nebbia, del riflesso e il DPR (massimo 1,5). Il telefono parte dal livello 1, il desktop dal 3. La risalita richiede 12 secondi consecutivi ad almeno 58fps e almeno 15 secondi dall’ultimo cambio; la discesa richiede 2 secondi sotto 52fps e almeno 3 secondi tra cambi. Preriscaldamento e scheda nascosta non alimentano la misura. Non esiste un ramo mobile che elimina l’ambiente o un effetto ([ambiente 3d](ambiente-3d.md#rifinitura-post-produzione)).
+- Shader e texture preparati progressivamente durante l’header 2d: un oggetto con `compileAsync` oppure un upload per tick, poi alcuni render della post-produzione. Un salto al computer ha precedenza e non aspetta il preriscaldamento; mappa d’ombra disegnata una volta; il layout della pagina si legge solo quando serve (avatar, nome in metallo); il vetro del computer non ha filtri CSS mentre la camera scende.
 - Materiali locali, luci e render target liberati allo smontaggio. Le risorse delle GLB condivise restano in cache.
 - Immagini WebP fino a 2400px, copertine piccole da 900px per le icone. I file rimangono separati dal codice (`assetsInlineLimit: 0`).
 - Zod esegue controlli in sviluppo/build, non viene scaricato dal sito di produzione.
@@ -49,9 +49,11 @@ Build e lint verificano codice e file dei progetti; la verifica browser deve cop
 
 Le misure Lighthouse del 26 settembre 2026 (prestazioni 81, accessibilità 96, buone pratiche 100, SEO 100) precedono il logo e l’ambiente V2: sono storiche e non descrivono la build corrente. L’obiettivo di 60fps non è una garanzia su ogni dispositivo. Ripetere misure sulla versione pubblicata e su telefoni fisici; un viewport mobile emulato verifica layout e interazioni, non le prestazioni del telefono.
 
-## misura della fluidità — 2 ottobre 2026
+## misura storica della fluidità — 2 ottobre 2026
 
-`npm run misura-fluidita -- <url> [telefono]` (`scripts/misura-fluidita.mjs`) apre Google Chrome senza finestra con la GPU vera del Mac, scorre la pagina a velocità costante e riporta per tratto fps medi, 1% peggiore, fotogrammi oltre 33 ms e il più lungo. «telefono» = viewport 390×844 con CPU 4× più lenta: indica i problemi di CPU, non le prestazioni grafiche di un telefono vero.
+**Non usare questa tabella come baseline del lavoro del 5 ottobre:** precede le correzioni allo strumento per attivare il pulsante d’ingresso e verificare lo sblocco dello scroll. La nuova verifica è in [navbar e mobile](navbar-mobile.md).
+
+`npm run misura-fluidita -- <url> [telefono]` (`scripts/verifiche/misura-fluidita.mjs`) apre Google Chrome senza finestra con la GPU vera del Mac, scorre la pagina a velocità costante e riporta per tratto fps medi, 1% peggiore, fotogrammi oltre 33 ms e il più lungo. «telefono» = viewport 390×844 con CPU 4× più lenta: indica i problemi di CPU, non le prestazioni grafiche di un telefono vero.
 
 Build di produzione, MacBook Pro M5 (alimentazione collegata), prima e dopo la fase di fluidità:
 

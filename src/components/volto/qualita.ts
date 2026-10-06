@@ -17,7 +17,8 @@ const fisso = Number.isFinite(richiesto) ? Math.max(0, Math.min(3, Math.round(ri
 const ascoltatori = new Set<(l: Livello) => void>()
 
 export const qualita = {
-  livello: (fisso ?? 3) as Livello,
+  livello: (fisso ?? (matchMedia('(max-width: 767px), (pointer: coarse) and (max-height: 500px)').matches ? 1 : 3)) as Livello,
+  fps: 60,
   bloccata: fisso !== null,
   imposta(l: number) {
     if (qualita.bloccata) return
@@ -33,4 +34,16 @@ export const qualita = {
   get valori() {
     return LIVELLI[qualita.livello]
   },
+}
+
+/** Un tetto condiviso dai due Canvas, senza cambiare la frequenza del ticker o dello scroll. */
+export function limitaFrame(invalidate: () => void) {
+  let ultimo = -Infinity
+  return () => {
+    const ora = performance.now()
+    if (document.hidden || ora - ultimo < 1000 / qualita.fps - 0.5) return false
+    ultimo = ora
+    invalidate()
+    return true
+  }
 }

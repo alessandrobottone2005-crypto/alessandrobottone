@@ -7,7 +7,7 @@ Dal 1 ottobre 2026 l’ambiente è una sala di cemento realistica (`sorgenti/sal
 La camera reale resta ferma (campo 40°, a 8,7 u dal piano del volto, così il volto ha la stessa misura di prima). Il mondo (sala e computer, `Mondo.tsx`) riceve la trasformazione inversa di una camera virtuale (`components/computer/inquadratura.ts`):
 
 - header: in fondo alla sala, guardando la parete con la colonna di luce;
-- discesa: la camera arretra e si alza, il computer appare a terra nel fascio di sole della fessura, poi scende fino allo schermo; il volto va dietro il monitor, coperto dal buffer di profondità ([computer](computer.md#il-volto-dietro-il-computer));
+- discesa: la camera arretra e si alza, la scrivania Macintosh appare nel fascio di sole della fessura, poi scende fino allo schermo; il volto va dietro il monitor, coperto dal buffer di profondità ([computer](computer.md#il-volto-dietro-il-computer));
 - biografia: si gira verso la parete sinistra in ombra; la metà destra resta scura per il testo;
 - contatti: dall’inizio della sala si vede tutta la sua lunghezza, con il fascio di luce al centro; una sfumatura scura in basso tiene leggibili pulsanti e copyright.
 
@@ -32,21 +32,21 @@ I punti vengono da `src/components/volto/stazioniSala.json`, scritto da `prepara
 | Bloom + alone | bagliore sulle zone più luminose e un secondo bagliore largo e tenue (halation) |
 | striscia anamorfica | `effettiCinema.ts`: striscia orizzontale appena fredda sulle luci forti, letta dalla texture dell’alone |
 | Vignette, AgX | vignetta e tone mapping; il renderer non applica AgX una seconda volta |
-| colore | `effettiCinema.ts`: bianco e nero noir (curva gamma 1,35, neri chiusi sotto 0,015, vignetta 0,68) con colore selettivo: resta solo l’arancione della luce della fessura (tonalità 24° ±26°, croma > 0,12). Schermo del computer, nome e UI restano fuori perché non sono nella scena |
+| colore | `effettiCinema.ts`: bianco e nero noir (curva gamma 1,35, neri chiusi sotto 0,015, vignetta 0,68) con colore selettivo: resta solo l’arancione della luce della fessura (tonalità 24° ±26°, croma con soglia dipendente dalla luminanza: 0,12–0,26 nelle ombre e 0,015–0,08 nelle alte luci; guadagno comune ai canali per evitare clipping della tinta). Schermo del computer, nome e UI restano fuori perché non sono nella scena |
 | sole arancione | `cinema.sole.colore` #ff7a24: `Sala.tsx` tinge la luce cotta dentro il fascio (stesso test geometrico del volume), il sole tinge il computer, la polvere è arancione; volume e riflessi della sala restano quasi neutri, così il volto resta in b/n |
 | glitch | `EffettoGlitch` (`effettiCinema.ts`): passaggio a sé subito dopo l’occlusione, acceso solo durante un glitch della camera o del logo (bande, blocchi, sdoppiamento rgb poi ridotto dal colore noir); a riposo spento ([glitch](animazioni.md#glitch)) |
 | aberrazione, grana | aberrazione cromatica lieve verso i bordi; grana pellicola animata dopo la tonalità. Il velo CSS `.grana` si spegne quando la scena 3d è visibile (`html[data-grana-webgl]`) |
 
 Nella sala, `PolvereNelFascio.tsx`: ≈ 9000 granelli finissimi (1–2 px) dentro il fascio di sole (un terzo attorno al computer), fluttuano lenti e scintillano pochi alla volta; niente dischi sfocati. Il volume usa un rumore ad alta frequenza con soglia: grana fine invece di velature. La camera respira come su uno steadicam (`CameraImmersiva.tsx`), ferma davanti allo schermo per tenere l’interfaccia allineata al vetro. Tutti i numeri sono in `cinema.ts`.
 
-Parametri di prova in sviluppo: `?ambiente=0` (senza sala), `?effetti=0` (senza post-produzione), `?senza=ao,nebbia,bagliore,vignetta,fuoco,polvere,alone,striscia,colore,aberrazione,grana,respiro,glitch`, `?polvere=0.02` (densità del pulviscolo nel volume, predefinita 0,008), `?qualita=0..3` (livello di qualità fisso).
+Parametri di prova in sviluppo: `?ambiente=0` (senza sala), `?effetti=0` (senza post-produzione), `?senza=ao,nebbia,bagliore,vignetta,fuoco,polvere,alone,striscia,colore,tonalita,aberrazione,grana,respiro,glitch`, `?polvere=0.02` (densità del pulviscolo nel volume, predefinita 0,008), `?qualita=0..3` (livello di qualità fisso).
 
-**Qualità adattiva** (`qualita.ts`, `PerformanceMonitor` di drei): stessa scena e stessi effetti su ogni dispositivo; se i fotogrammi non stanno nei 60fps scendono in ordine la risoluzione e i passi della nebbia, la risoluzione del riflesso del pavimento e il DPR (1,5 → 1,25 → 1), e risalgono quando c’è margine. **Preriscaldamento** (`riscaldamento.ts`): appena sala, computer e avatar sono scaricati, mentre il Canvas è ancora invisibile, si compilano tutti gli shader, le texture salgono sulla GPU e si disegnano alcuni fotogrammi: il passaggio al 3d e l’arrivo dell’avatar non scattano più. La mappa d’ombra del sole si disegna una volta (sala e computer si muovono insieme alla luce), a ogni fotogramma si aggiorna solo la sua matrice. Con movimento ridotto: stessa sala e stessi effetti, volume e polvere fermi, niente respiro.
+**Qualità adattiva** (`qualita.ts`, campioni dei render reali in `Volto3D.tsx`): stessa scena e stessi effetti su ogni dispositivo. Telefono al livello 1 iniziale, desktop al 3; quattro livelli invariati. Scende dopo almeno 2s sotto 52fps (almeno 3s tra cambi), risale dopo 12s consecutivi ad almeno 58fps (almeno 15s dall’ultimo cambio). Scheda nascosta e preriscaldamento azzerano i campioni. Anche il nome segue il DPR adattivo e le richieste continue di entrambi i Canvas sono limitate a 60fps. **Preriscaldamento** (`riscaldamento.ts`, `Volto3D.tsx`): le risorse entrano in coda man mano che arrivano; un upload o un oggetto compilato per tick con `compileAsync`, seguito da pochi render della post-produzione. La preparazione cede al rendering normale se l’utente raggiunge subito il 3d; non trattiene mai l’ingresso. La mappa d’ombra del sole si disegna una volta (sala e computer si muovono insieme alla luce), a ogni fotogramma si aggiorna solo la sua matrice. Con movimento ridotto: stessa sala e stessi effetti, volume e polvere fermi, niente respiro.
 
 ## computer
 
-- `Computer.glb` (originale in `sorgenti/computer/`) è ottimizzato in `public/computer/computer.glb` (≈ 1 MB) con `npm run prepara-computer`.
-- Poggia dove la luce della fessura tocca il pavimento, scala ×4, vetro rivolto verso l’inizio della sala.
+- `ScrivaniaComputer.glb` (originale in `sorgenti/computer/originali/`, kreems, CC BY 4.0) è preparato senza marchi e con CRT spento in `public/computer/computer.glb` (1,06 MiB) con `npm run prepara-computer`. La postazione completa è alta 3,1 u, con misure e piano del vetro generati in `misureComputer.json`.
+- Poggia dove la luce della fessura tocca il pavimento, scala ×2,634177 (altezza complessiva 3,1 u), vetro rivolto verso l’inizio della sala.
 
 ## file da regolare
 
@@ -86,3 +86,8 @@ Build TypeScript/Vite e lint completati. Verifica nel browser a 1440×900, 820×
 ## manutenzione — 29 settembre 2026
 
 Allora il componente di scroll era `Spirale.tsx` in `src/sections/Portfolio/`, con l’id ScrollTrigger `portfolio-anello`; entrambi sono stati rimossi il 1 ottobre 2026 con il passaggio al computer (oggi `Portfolio.tsx`, id `portfolio-computer`). La pila mobile e le misure della vecchia card header sono state eliminate perché non usate. La home usava già la V2: copie pubbliche del modello V1 e dell’HDRI rimosse, sorgenti conservati fuori dal runtime. Debugging e controlli correnti sono descritti in [accessibilità e prestazioni](accessibilita-prestazioni.md) e [pubblicazione](pubblicazione.md).
+
+
+### colore selettivo — 5 ottobre 2026
+
+La soglia di croma fissa poteva neutralizzare i colori caldi desaturati da AgX. Il filtro ora usa una soglia più bassa nelle sole alte luci e limita il guadagno dei tre canali insieme; i grigi con croma zero restano neutri. Tutti gli effetti restano attivi. `npm run diagnostica-luce` confronta colore, nebbia, bagliore/alone/striscia e AgX in una stessa posa: disabilitare AgX produce clipping evidente, mentre togliere nebbia o bagliore altera la resa senza dimostrare la causa del bordo segnalato. Sul Mac il difetto specifico dell’iPhone non è stato riprodotto con certezza: la correzione va confermata su iPhone 14, iOS 17.0.1, Chrome. [Protocollo ed esiti](navbar-mobile.md).

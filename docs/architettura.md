@@ -30,14 +30,21 @@ Zod non è nel runtime di produzione; shadcn è uno strumento di sviluppo, i com
 ```text
 .
 ├─ README.md, CLAUDE.md       guida iniziale, brief corrente e storico
-├─ docs/                     documentazione
+├─ docs/                     guide tecniche e pubblicazione; indice in README.md
 ├─ scripts/                  authoring, validazione, immagini e icone
+│  ├─ verifiche/             navigazione, computer, fluidità e diagnostica luce
+│  ├─ lib/                   controllo Chrome condiviso dalle verifiche
+│  └─ blender/               esportazione dei modelli dei progetti
+├─ verifiche/                guida ai controlli e risultati locali
+│  └─ risultati/             screenshot e report, esclusi da Git e deploy
 ├─ sorgenti/                 originali creativi; esclusi dal sito
 │  ├─ logo/                  Logo.svg e Logo.glb originali forniti
 │  ├─ logo-3d/               scene Blender, texture, export, script e anteprime
 │  │  └─ legacy/             vecchio volto.glb conservato
 │  ├─ sala/                  Ambiente.glb, scena realistica, cottura ed esportazione
-│  ├─ computer/              Computer.glb originale
+│  ├─ computer/              fonte, licenza e procedura della postazione Macintosh
+│  │  ├─ originali/          ScrivaniaComputer.glb intatto, unico computer conservato
+│  │  └─ export/             derivato intermedio rigenerabile, escluso da Git
 │  ├─ progetti/              pdf originali dei progetti, solo sul disco (ignorati da git)
 │  ├─ font/                  Outfit-Black.ttf statico (OFL) per il nome in metallo
 │  ├─ audio/                 musica e suoni originali, solo sul disco; fonti e licenze nel README
@@ -104,7 +111,7 @@ Zod non è nel runtime di produzione; shadcn è uno strumento di sviluppo, i com
 | `scenaImmersiva.ts` | posizione/scala del logo e posizioni dei fari |
 | `CameraImmersiva.tsx` | camera reale ferma, inclinazione d’ingresso nell’header |
 | `Mondo.tsx` | sala e computer mossi come se si spostasse una camera virtuale (`components/computer/inquadratura.ts`) |
-| `ComputerNellaScena.tsx`, `modelloComputer.ts` | computer a terra, bagliore del vetro, aggancio dell’interfaccia |
+| `ComputerNellaScena.tsx`, `modelloComputer.ts` | postazione Macintosh, bagliore sul piano del vetro condiviso, aggancio dell’interfaccia |
 | `LuciTeatro.tsx` | tre fari V2 con inerzia |
 | `Sala.tsx`, `modelloSala.ts`, `luceSala.ts` | sala con luce cotta, pavimento bagnato riflettente, sole in tempo reale |
 | `Rifinitura.tsx` | post-produzione e render finale: occlusione, volume, bagliore, vignetta, AgX |
@@ -119,7 +126,7 @@ Le timeline scrivono valori condivisi; R3F li legge nel ciclo di rendering. Gli 
 
 `lib/gsap.ts` registra i plugin. `lib/scroll.ts` crea Lenis, lo collega a ScrollTrigger e al ticker GSAP, gestisce blocco/ripresa (preloader) e scroll programmati. Movimento ridotto: scroll nativo; se la preferenza cambia a sito aperto, `scroll.ts` riporta la pagina nella stessa sezione dopo che le sezioni si sono rimontate (nel portfolio a metà della sosta).
 
-- Header: 400vh desktop/tablet, 300vh telefono.
+- Header: circa 332vh desktop/tablet e 249vh telefono, con le tre discipline attive (400/300vh se si riattiva web design).
 - Portfolio: si sovrappone all’ultimo schermo dell’header; 100vh di avvicinamento e 120vh di sosta senza pin (ScrollTrigger `portfolio-computer`, letto da `percorso.ts`, da `scroll.ts` e dal link diretto). L’interfaccia del computer è DOM `fixed` posato sul vetro con una `matrix3d`, interattiva solo nella sosta. Acceso/spento si controlla anche a ogni tick di GSAP (i refresh di ScrollTrigger non chiamano `onUpdate`); a resize e rotazione chi sta nella sosta resta nello stesso punto. Il nascondino del volto è `useNascondino` in `Portfolio.tsx`.
 - Biografia: pin solo quando il testo entra nello schermo; altrimenti flusso normale. Testo sopra il volume.
 - Contatti: logo fermo in posa/dimensione, espressioni vive; pulsanti e copyright sopra l’ambiente.

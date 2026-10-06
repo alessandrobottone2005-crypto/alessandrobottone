@@ -20,9 +20,10 @@ function posa(el: HTMLElement | null, r: Ingombro, margine: number) {
     cy = (r.alto + r.basso) / 2
   const w = Math.max(MINIMO, r.destra - r.sinistra + margine * 2),
     h = Math.max(MINIMO, r.basso - r.alto + margine * 2)
-  el.style.transform = `translate3d(${cx - w / 2}px, ${cy - h / 2}px, 0)`
-  el.style.width = `${w}px`
-  el.style.height = `${h}px`
+  const transform = `translate3d(${cx - w / 2}px, ${cy - h / 2}px, 0)`
+  if (el.style.transform !== transform) el.style.transform = transform
+  if (el.style.width !== `${w}px`) el.style.width = `${w}px`
+  if (el.style.height !== `${h}px`) el.style.height = `${h}px`
 }
 
 export function Accensione() {
@@ -36,9 +37,10 @@ export function Accensione() {
   useEffect(() => {
     if (fase !== 'spento') return
     const r: Ingombro = { sinistra: 0, destra: 0, alto: 0, basso: 0, profondita: 0 }
+    let precedente = false
     const tick = () => {
       const ora = accendibile()
-      setPronto((p) => (p === ora ? p : ora))
+      if (ora !== precedente) { precedente = ora; setPronto(ora) }
       if (!ora) return
       const w = document.documentElement.clientWidth,
         h = innerHeight

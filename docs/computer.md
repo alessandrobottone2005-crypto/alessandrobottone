@@ -1,6 +1,6 @@
 # computer
 
-Il portfolio è un computer beige appoggiato sul pavimento della sala di cemento, nel fascio di luce della fessura. Dopo l’header la camera abbassa lo sguardo e scende fino a inquadrare monitor, tastiera e mouse. Il computer è spento: si accende con un clic (o tocco) sul monitor o sul mouse 3d, o con Invio su un pulsante invisibile sopra il monitor; parte la sequenza di avvio e la camera entra verso lo schermo. Una volta acceso resta acceso. Sullo schermo c’è un’interfaccia che riprende il Finder del Macintosh 1984: scrivania con una cartella per disciplina (illustrazione, branding, 3d; web design torna con `webDesignAttivo` in `src/config/discipline.ts`) e, dentro, un documento per progetto. Sulla scrivania ci sono anche tre applicazioni: «scacchi», «paint» e «dediche» ([applicazioni](#applicazioni)).
+Il portfolio è una postazione Macintosh 128K con scrivania di legno, tastiera, mouse, libri e accessori nella sala di cemento, nel fascio di luce della fessura. Dal 6 ottobre 2026 sostituisce il vecchio PC a terra. Dopo l’header la camera abbassa lo sguardo e scende fino a inquadrare la postazione completa. Il computer è spento: si accende con un clic (o tocco) sul monitor o sul mouse 3d, o con Invio su un pulsante invisibile sopra il monitor; parte la sequenza di avvio e la camera entra verso lo schermo. Una volta acceso resta acceso. Sullo schermo c’è un’interfaccia che riprende il Finder del Macintosh 1984: scrivania con una cartella per disciplina (illustrazione, branding, 3d; web design torna con `webDesignAttivo` in `src/config/discipline.ts`) e, dentro, un documento per progetto. Sulla scrivania ci sono anche tre applicazioni: «scacchi», «paint» e «dediche» ([applicazioni](#applicazioni)).
 
 Regole concordate il 1 ottobre 2026: dentro lo schermo bianco e nero e carattere ChicagoFLF (eccezione alle regole 1 e 2 di `CLAUDE.md`, valida solo lì); copertine e immagini dei progetti sempre a colori; testi in minuscolo come nel resto del sito. Dal 2 ottobre 2026 bianco e nero non sono più puri: sono i fosfori di un tubo vero (`--mac-bianco` #e7e1d1, `--mac-nero` #161614).
 
@@ -14,7 +14,7 @@ L’interfaccia resta DOM (cliccabile e accessibile), quindi non passa per la po
 - sporco: polvere, aloni e due ditate generati come SVG `feTurbulence` in data URI (nessun file), in `screen`;
 - movimento: grana a scatti, banda di refresh lenta e sfarfallio; fermi con movimento ridotto. Su telefono grana e ombre sono più leggere.
 
-Nella scena 3d il piano di luce davanti al vetro ha il colore dei fosfori ed è appena sopra la soglia del Bloom, così cornice, tastiera e pavimento ricevono l’alone dello schermo acceso.
+Nella scena 3d il piano di luce davanti al vetro ha il colore dei fosfori ed è appena sopra la soglia del Bloom, così cornice, tastiera e scrivania ricevono l’alone dello schermo acceso.
 
 ## file
 
@@ -36,9 +36,9 @@ Nella scena 3d il piano di luce davanti al vetro ha il colore dei fosfori ed è 
 
 La camera reale non si sposta mai (z ≈ 8,7, campo 40°): il volto è misurato in pixel e non cambia scala; sta sul piano z = 0, tranne dietro il computer dove ha una sua profondità. A muoversi è il «mondo» (`Mondo.tsx`): edificio e computer ricevono la trasformazione inversa di una camera virtuale che percorre l’edificio. `percorso.stazione` va da 0 (header) a 1 (fermi davanti al computer), 2 (biografia), 3 (contatti). Alla stazione 1 l’inquadratura dipende da `percorso.computer.zoom`: 0 = larga (computer spento), 1 = davanti allo schermo (acceso).
 
-- avvicinamento, 100vh (`movimento.computer.avvicinamento`): la camera scivola dalla stazione header a quella del computer, abbassa lo sguardo sul computer a terra (≈ 40% del tratto) e poi scende fino all’inquadratura corrente. Il volto va dietro il computer (sezione seguente).
-- inquadratura larga (`movimento.computer.larga`): vista un po’ dall’alto (`elevazione` 17°) su monitor, tastiera e mouse, con spazio sopra il monitor per il volto (`testa`). La distanza è la minima che fa stare tutti gli angoli dell’insieme nella frazione di vista `riempie` (telefono: `riempieTelefono`), calcolata in `inquadratura.ts` (`distanzaLarga`).
-- accensione: solo fermi davanti al computer spento (`accendibile()` in `stato.ts`), con un clic o un tocco sul monitor o sul mouse 3d, o Invio/Spazio sul pulsante «accendi il computer». Il Canvas non riceve eventi, quindi niente raycast: `Accensione.tsx` posa due elementi DOM fissi sopra le proiezioni di monitor e mouse (`proiettaMonitor`, `proiettaMouse`, almeno 48px), aggiornati sul ticker di GSAP. Il cursore del sito mostra «accendi»; il mouse 3d pulsa appena (`movimento.computer.invito`): un guscio additivo bianco costruito dai triangoli della mesh «keyboard2» che cadono nell’ingombro `MOUSE` (tastiera e mouse sono una sola mesh).
+- avvicinamento, 100vh (`movimento.computer.avvicinamento`): la camera scivola dalla stazione header a quella del computer, abbassa lo sguardo sulla postazione (≈ 40% del tratto) e poi scende fino all’inquadratura corrente. Il volto va dietro il computer (sezione seguente).
+- inquadratura larga (`movimento.computer.larga`): vista un po’ dall’alto (`elevazione` 17°) sulla scrivania completa, con spazio sopra il monitor per il volto (`testa`). La distanza è la minima che fa stare tutti gli angoli dell’insieme nella frazione di vista `riempie` (telefono: `riempieTelefono`), calcolata in `inquadratura.ts` (`distanzaLarga`).
+- accensione: solo fermi davanti al computer spento (`accendibile()` in `stato.ts`), con un clic o un tocco sul monitor o sul mouse 3d, o Invio/Spazio sul pulsante «accendi il computer». Il Canvas non riceve eventi, quindi niente raycast: `Accensione.tsx` posa due elementi DOM fissi sopra le proiezioni di monitor e mouse (`proiettaMonitor`, `proiettaMouse`, almeno 48px), aggiornati sul ticker di GSAP. Il cursore del sito mostra «accendi»; il mouse 3d pulsa appena (`movimento.computer.invito`): un guscio additivo bianco costruito dai triangoli nell’ingombro `MOUSE`, misurato sulle parti del nuovo mouse prima del join del GLB.
 - zoom: all’accensione GSAP porta `percorso.computer.zoom` da 0 a 1 (`movimento.computer.zoom`, 2,2s), indipendente dallo scroll: la camera entra fino all’inquadratura di sempre (desktop/tablet: cornice visibile; telefono: interfaccia a tutta vista). Lo scroll resta libero e reversibile.
 - una volta acceso resta acceso: risalendo verso l’header e tornando giù lo schermo è già acceso e l’inquadratura resta vicina. `spegni()` esiste ancora in `stato.ts` ma il percorso non la usa.
 - link diretto `/progetti/:slug` e movimento ridotto: acceso subito (`accendi(true)`), senza sequenza, inquadratura vicina.
@@ -62,7 +62,7 @@ Tutto su un canvas a bassa risoluzione (un pixel del sistema ≈ 3–4px), sogli
 
 ## il volto dietro il computer
 
-`leggiPosa` (`src/components/volto/percorso.ts`) proietta l’ingombro del monitor (`MONITOR` e `proiettaMonitor` in `inquadratura.ts`, mesh «monik2» di `Computer.glb`) e posa il volto rispetto a quel rettangolo. Oltre a posizione e larghezza in pixel la posa ha una profondità `z`: il volto sta `distacco` unità dietro il punto più lontano del monitor e `Volto3D.tsx` converte i pixel alla sua profondità. L’occlusione è quella vera del depth buffer; l’interfaccia DOM resta sopra il vetro. Le proporzioni del volto (lenti, pupille) vengono da `geometria.ts`. `inquadratura.ts` registra la proiezione in `misureScena` quando arriva il codice 3d, così three.js resta fuori dal bundle iniziale.
+`leggiPosa` (`src/components/volto/percorso.ts`) proietta l’ingombro del monitor (`MONITOR` e `proiettaMonitor` in `inquadratura.ts`, ingombro del Macintosh in `misureComputer.json`) e posa il volto rispetto a quel rettangolo. Oltre a posizione e larghezza in pixel la posa ha una profondità `z`: il volto sta `distacco` unità dietro il punto più lontano del monitor e `Volto3D.tsx` converte i pixel alla sua profondità. L’occlusione è quella vera del depth buffer; l’interfaccia DOM resta sopra il vetro. Le proporzioni del volto (lenti, pupille) vengono da `geometria.ts`. `inquadratura.ts` registra la proiezione in `misureScena` quando arriva il codice 3d, così three.js resta fuori dal bundle iniziale.
 
 - discesa (`movimento.computer.volto`): fra `versoDa` e `versoA` dell’avvicinamento il volto scivola dal centro dietro il monitor, largo `fattore` (1,25) volte il monitor visto dalla camera, con lenti e occhi sopra il bordo. Nell’inquadratura larga (spento) resta così, sporgente sopra il monitor. Da `nascondiDa` (0,85) si abbassa e arretra finché, visto da qui, è largo `fattoreNascosto` (0,86) volte il monitor: tutto coperto; questo nascondersi è moltiplicato per lo zoom, quindi avviene mentre la camera entra verso lo schermo acceso. Tutto scrubbato e reversibile.
 - nascondino (`movimento.computer.sbircia`, `useNascondino` in `Portfolio.tsx`): solo fermi davanti al computer (con entrambe le inquadrature, non durante lo zoom), GSAP anima `percorso.computer.sbircia` {lato, uscita}. Il volto esce (0,9s), resta 4–8s, rientra (0,7s), aspetta 1,4–3s e cambia lato; mai lo stesso due volte di fila. I lati dipendono dallo spazio (`latiDisponibili`): un lato vale se si vedono gli occhi interi. Su desktop e tablet orizzontale c’è spazio solo ai lati (destra/sinistra, lente intera e testa inclinata di 9°); su tablet verticale sopra, e destra/sinistra diventano «sopra, spostato». Su telefono nessun nascondino: l’interfaccia copre tutto. Mentre dorme non sbuca.
@@ -73,7 +73,7 @@ Tutto su un canvas a bassa risoluzione (un pixel del sistema ≈ 3–4px), sogli
 
 L’interfaccia non è una texture: è DOM vero, quindi nitida, cliccabile e accessibile. La sua risoluzione è la misura in pixel del vetro nella sosta (`misuraSosta`); a ogni fotogramma i quattro angoli del vetro vengono proiettati e trasformati in una `matrix3d` (omografia). La scena 3d chiama l’aggiornamento subito prima di disegnare, così DOM e WebGL restano allineati; senza scena (errore o caricamento) l’interfaccia si aggiorna da sola sul ticker di GSAP.
 
-Il rettangolo del vetro (`VETRO` in `inquadratura.ts`) è misurato in Blender con una vista frontale di `Computer.glb`. Se il modello cambia va rimisurato ([sorgenti del computer](../sorgenti/computer/README.md)).
+Il piano del vetro (`VETRO` in `inquadratura.ts`) viene dai quattro angoli calibrati davanti al CRT curvo in `misureComputer.json`, generati da `prepara-computer`. Centro, normale e matrice sono condivisi da interfaccia, bagliore e luce. Se il modello cambia va rimisurato ([sorgenti del computer](../sorgenti/computer/README.md)).
 
 ## uso
 
@@ -117,7 +117,7 @@ Il 3d si scarica comunque (scelta del 1 ottobre 2026), ma la scena è ferma: sez
 
 ## crediti
 
-`Computer.glb` è un modello Sketchfab con licenza CC BY 4.0: autore e link vanno indicati in `src/config/sito.ts` (`computer.crediti.modello` e `modelloLink`) e compaiono in «informazioni»; lo stesso vale per la sala (`ambiente` e `ambienteLink`, licenza da verificare). Finché mancano, la build mostra un avviso. Il 1 ottobre 2026 alessandro ha scelto di pubblicare comunque con i segnaposto (rischio accettato): i crediti restano da completare ([sorgenti del computer](../sorgenti/computer/README.md), [sorgenti della sala](../sorgenti/sala/README.md)). ChicagoFLF è di Robin Casady, dominio pubblico (`src/assets/font/README.ChicagoFLF.txt`).
+La postazione deriva da [Macintosh 128K di kreems](https://sketchfab.com/3d-models/macintosh-128k-896ea439b67b4606a23fb8b93be6af6d), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Autore, link, licenza e modifiche alla copia derivata sono in `src/config/sito.ts` e compaiono in «informazioni». Anche i crediti della sala sono completi. Gli originali dei due Macintosh e del vecchio PC sono conservati ([sorgenti del computer](../sorgenti/computer/README.md)). ChicagoFLF è di Robin Casady, dominio pubblico (`src/assets/font/README.ChicagoFLF.txt`). Le verifiche storiche seguenti riguardano il PC precedente.
 
 ## verifica — 1 ottobre 2026
 
@@ -166,3 +166,25 @@ Lint e build superati. Server di sviluppo con Chrome headless a 1440×900 e 390�
 ### testo (`Testo.tsx`)
 
 paragrafi; una riga vuota nel testo li separa.
+
+
+## navbar e orientamento — 5 ottobre 2026
+
+Il link portfolio salta a metà della sosta tramite `destinazioneScroll` in `src/lib/scroll.ts`, condiviso con gli indirizzi diretti dei progetti. Accende subito il computer e interrompe anche un avvio già iniziato. Scroll, scrub, posa e interfaccia vengono sincronizzati prima di focalizzare la sezione. I link chi sono e contatti lasciano montato il Finder e conservano la rotta del progetto, le finestre e le posizioni.
+
+Sul telefono la fascia superiore include nome e navbar; sotto resta lo spazio per l’audio. Menu e titolo della finestra sono alti 44px. Anche in orizzontale (puntatore touch, larghezza sotto 1024px e altezza sotto 500px) il Finder occupa la vista: icone su tre colonne e contenitore scorrevole. In movimento ridotto un errore WebGL lascia disponibile il Finder DOM. [Verifiche ripetibili](navbar-mobile.md).
+
+
+## postazione Macintosh — 6 ottobre 2026
+
+Sostituito il PC con la scrivania completa «Macintosh 128K» di kreems (CC BY 4.0). Originale della sola postazione conservato in `sorgenti/computer/originali/`; PC precedente e Macintosh Classic eliminati su richiesta. Solo il derivato entra in `public/computer/`. Marchi Apple rimossi intervenendo sui materiali delle superfici corrispondenti (compreso il disegno sul post-it, di cui resta il testo), nessun accessorio tolto. CRT scuro senza emissione originale, poi avvio e Finder del sito.
+
+`npm run prepara-computer` produce il GLB web e `misureComputer.json`: origine a pavimento, altezza complessiva 3,1 u, ingombri separati per Macintosh e mouse, quattro angoli del piano inclinato davanti al CRT. DOM, bagliore e luce condividono centro, normale e matrice; l’inquadratura larga include la scrivania, quella vicina guarda lungo la normale del vetro. Il volto continua a usare il solo monitor per occlusione e nascondino. Invito del mouse selezionato dagli ingombri anziché dal nome della vecchia mesh.
+
+Asset finale: **1.108.492 byte (1,06 MiB / 1,11 MB decimali), 45.425 triangoli, 18 mesh/materiali**, texture WebP ≤1024 px, Meshopt. Nessuna nuova dipendenza. Crediti del computer e della sala completi. Build e lint superati; resta l’avviso Vite sui chunk grandi, senza errori di compilazione.
+
+Verifiche con Chrome headless e GPU Metal sul Mac: `verifica-computer` (asset, monitor e Invio a 1440×900, mouse a 820×1180, tocco sul mouse a 390×844, monitor in orizzontale 844×390, movimento ridotto desktop, modello bloccato) e `verifica-navigazione` (sette flussi con finestre, rotte, ritorno, focus, rotazione, rete lenta, WebGL assente). Tutti i casi passati senza eccezioni runtime inattese. Il GLB finale viene controllato per appoggio, altezza, assenza di emissioni, limiti delle texture e presenza dei triangoli del mouse dopo l’ottimizzazione.
+
+Anteprime e risultati in `verifiche/risultati/test-macintosh/` (fuori da Git): `computer/desktop-monitor-spento.png` e `computer/desktop-monitor-acceso.png`, oltre ai formati tablet/mobile. Le fotografie della postazione finale confermano schermo nella cornice, appoggio, riflessi, ombre e nascondino. Per la pubblicazione vedere [stato del deploy](pubblicazione.md).
+
+Misure con `misura-fluidita`: percorso desktop e telefono emulato 390×844 con CPU rallentata 4× a **60 fps medi durante la discesa**, nessun campione oltre 33 ms in quel tratto; desktop e telefono emulato con `--computer-acceso` a **60 fps medi anche nella sosta**. Nel percorso mobile già acceso la biografia registra 57 fps medi con un picco di 200 ms; le altre fasi di scroll restano a 60 fps in questa misura. Campioni completi nei JSON `fluidita-*.json`. L’ingresso ha alcuni picchi (fino a 317 ms nel telefono emulato). L’emulazione conserva la GPU del Mac: non equivale a una misura su telefono fisico.
