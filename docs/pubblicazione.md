@@ -5,8 +5,30 @@
 - [Repository GitHub](https://github.com/alessandrobottone2005-crypto/alessandrobottone) (rinominato il 2 ottobre 2026 da `ProvaLandingPagePortfolio_Claude`; i vecchi link reindirizzano).
 - Progetto Vercel: `alessandrobottone` (rinominato da `provalandingpageportfolio-claude`), team ABDesign (`abd-esign1`), Vite e Node 24.
 - [Dominio di produzione](https://alessandrobottone.vercel.app); il vecchio [provalandingpageportfolio-claude.vercel.app](https://provalandingpageportfolio-claude.vercel.app) resta attivo. Le righe sotto conservano gli indirizzi storici com’erano.
-- Branch di lavoro: `main`. Il 1 ottobre 2026 vi è stato fuso `prova/computer-retro` (computer retrò, sala di cemento, avatar a punti, volto dietro il computer); il 2 ottobre 2026 `prova/nome-3d-schermo` (nome in metallo 3d, schermo realistico, scena noir, primi progetti veri).
+- Branch di produzione: `main`; il 6 ottobre 2026 integra anche `prova/audio-computer` e la postazione Macintosh definitiva. Il 1 ottobre 2026 vi è stato fuso `prova/computer-retro` (computer retrò, sala di cemento, avatar a punti, volto dietro il computer); il 2 ottobre 2026 `prova/nome-3d-schermo` (nome in metallo 3d, schermo realistico, scena noir, primi progetti veri).
 - Branch storico: `codex/manutenzione-portfolio-3d`, da cui è stata pubblicata la versione del 29 settembre 2026.
+
+## pubblicazione del 6 ottobre 2026 — postazione Macintosh definitiva
+
+Autorizzata da Alessandro in chat: tenere la scrivania con Macintosh 128K, eliminare gli altri due computer, riordinare cartelle e file, aggiornare `main` su GitHub e pubblicare su Vercel. Il ramo `prova/audio-computer` è stato integrato in `main` con fast-forward, includendo il lavoro precedente su audio, app, navigazione e prestazioni.
+
+| voce | esito verificato |
+|---|---|
+| commit del codice | [`8d4142a`](https://github.com/alessandrobottone2005-crypto/alessandrobottone/commit/8d4142ae0ddb73424b1f53e22ca1395f2cfb7dfe), push `29ae3b1..8d4142a` su `main` riuscito |
+| modello definitivo | solo Macintosh 128K con scrivania; originale intatto in `sorgenti/computer/originali/ScrivaniaComputer.glb`, web in `public/computer/computer.glb`; PC precedente e Classic alternativo eliminati dal progetto corrente |
+| attribuzioni | autore, link originale, licenza e modifiche del computer; autore, link originale e licenza della sala; verificati nella finestra informazioni online |
+| riordino | strumenti browser in `scripts/verifiche/`, helper in `scripts/lib/`, screenshot e report in `verifiche/risultati/` esclusi da Git/deploy; indici in docs, sorgenti, scripts e verifiche; link interni corretti |
+| controlli locali | lint e build riusciti, rigenerazione dal nuovo percorso identica alla build; asset e sette flussi del computer, sette flussi di navigazione superati |
+| deploy di produzione | `READY`, 6 ottobre 2026 alle 10:50 (Europe/Rome); avviato dall’integrazione Git al push su `main` |
+| versione immutabile | [alessandrobottone-bb3fcy12d-abd-esign1.vercel.app](https://alessandrobottone-bb3fcy12d-abd-esign1.vercel.app) |
+| dominio pubblico | [alessandrobottone.vercel.app](https://alessandrobottone.vercel.app); vecchio dominio ancora collegato |
+| deployment e durata | `dpl_HB7xiVjJiVDgQdPXb6S4nD5ic8TP`; 54 secondi di build, Vite/Node 24 |
+| verifiche online | 123 rotte e asset in HTTP 200 (home, nove progetti, rotta inesistente e asset statici/chunk individuati dalla build pubblicata); GLB del computer identico via SHA-256, 1.108.492 byte; sette flussi computer e sette navigazione superati su desktop/tablet/telefono, anche orizzontale, movimento ridotto, WebGL/modello assente e rete lenta |
+| applicazioni online | scacchi: apertura, mossa e risposta dell’avversario; paint: apertura e tela; nessuna eccezione runtime inattesa |
+| limite già presente | nessuna variabile Google Drive configurata in produzione; `GET /api/dediche` restituisce 503 `non-configurato` e l’interfaccia segnala che le dediche non sono ancora attive; guida in [dediche](dediche-google-drive.md) |
+| limiti delle prove | viewport mobile emulata sul Mac; non verificati telefoni fisici, Safari/Firefox o Lighthouse |
+
+Report JSON e anteprime locali/online in `verifiche/risultati/pubblicazione-6-ottobre/` (fuori da Git). La registrazione degli esiti è un commit successivo di sola documentazione; il codice verificato resta quello indicato sopra. La build mantiene l’avviso Vite sui chunk oltre 500 kB, senza errori.
 
 ## pubblicazione del 2 ottobre 2026
 
@@ -83,6 +105,8 @@ Il push di un branch può generare una preview se l’integrazione Git è attiva
 | `public/` | sì | tutti i file della cartella: solo asset necessari |
 | `sorgenti/`, scene Blender, texture, render finiti | sì | esclusi dall’upload CLI con `.vercelignore` |
 | `docs/`, README e brief | sì | esclusi dall’upload CLI |
+| `scripts/verifiche/`, `scripts/lib/` | sì | strumenti locali esclusi dall’upload CLI |
+| `verifiche/risultati/` | no | screenshot e report locali esclusi |
 | foto originali e `_originali/` dei progetti | conservati | esclusi dall’upload CLI se non importati |
 | frame PNG rigenerabili | no | rimossi; rigenerabili dagli script Blender |
 | `*.blend1` e altri backup numerati | sul disco, ignorati Git | esclusi |
