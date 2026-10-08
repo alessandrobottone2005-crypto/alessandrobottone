@@ -1,31 +1,42 @@
-// stato di avvio del sito: il preloader segna “pronto” quando ha finito, il pulsante «inizia a scrollare»
-// segna “entrato” (scroll libero, audio avviato); l’header registra dove sta il suo volto (il preloader ci vola sopra).
-import { createContext, useContext, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
+// L’interfaccia è indipendente dalla preparazione della scena, richiesta soltanto entrando nell’esperienza.
+import { createContext, useContext, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { useLocation } from 'react-router'
+import { attivitaScena } from '@/lib/attivitaScena'
 
 type Valore = {
   pronto: boolean
   setPronto: (p: boolean) => void
-  /** prepara la scena durante l’uscita del preloader, prima di mostrare il pulsante d’ingresso */
   preparaScena: boolean
   setPreparaScena: (p: boolean) => void
-  /** ingresso fatto: fino ad allora lo scroll resta bloccato. Con un link diretto a un progetto è già vero */
   entrato: boolean
   setEntrato: (e: boolean) => void
-  /** il contenitore del volto nell’header: la destinazione del volo */
+  esperienzaRichiesta: boolean
+  richiediEsperienza: () => void
+  scenaAttiva: boolean
+  ingressoVisibile: boolean
   voltoHeader: RefObject<HTMLDivElement | null>
 }
-
 const Contesto = createContext<Valore | null>(null)
-
 export function AvvioProvider({ children }: { children: ReactNode }) {
+  const { pathname, hash } = useLocation()
   const [pronto, setPronto] = useState(false)
   const [preparaScena, setPreparaScena] = useState(false)
-  const [entrato, setEntrato] = useState(() => location.pathname.startsWith('/progetti/'))
+  const [entrato, setEntrato] = useState(false)
+  const [richiesta, setRichiesta] = useState(() => pathname === '/' && ['#header', '#portfolio', '#chi-sono', '#contatti'].includes(hash))
+  // I frammenti sono destinazioni della home: anche un collegamento diretto può richiedere la scena.
+  const destinazioneHome = pathname === '/' && ['#header', '#portfolio', '#chi-sono', '#contatti'].includes(hash)
+  const esperienzaRichiesta = richiesta || destinazioneHome
+  const ingressoVisibile = pathname === '/' && !destinazioneHome
+  const scenaAttiva = pathname === '/laboratorio' || (esperienzaRichiesta && destinazioneHome)
+  useLayoutEffect(() => {
+    attivitaScena.imposta(scenaAttiva)
+  }, [scenaAttiva, destinazioneHome])
   const voltoHeader = useRef<HTMLDivElement>(null)
-  const valore = useMemo(() => ({ pronto, setPronto, preparaScena, setPreparaScena, entrato, setEntrato, voltoHeader }), [pronto, preparaScena, entrato])
+  const valore = useMemo(() => ({ pronto, setPronto, preparaScena, setPreparaScena, entrato, setEntrato,
+    esperienzaRichiesta, richiediEsperienza: () => setRichiesta(true), scenaAttiva, ingressoVisibile, voltoHeader,
+  }), [pronto, preparaScena, entrato, esperienzaRichiesta, scenaAttiva, ingressoVisibile])
   return <Contesto.Provider value={valore}>{children}</Contesto.Provider>
 }
-
 // eslint-disable-next-line react-refresh/only-export-components
 export function useAvvio() {
   const valore = useContext(Contesto)

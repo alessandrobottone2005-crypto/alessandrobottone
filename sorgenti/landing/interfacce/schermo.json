@@ -1,0 +1,20 @@
+{
+  "width": 640,
+  "height": 517,
+  "columns": 10,
+  "rows": 12,
+  "tiles": 118,
+  "bootStart": 1,
+  "bootFrames": 110,
+  "states": {
+    "spento": 0,
+    "desktop": 111,
+    "illustrazione": 112,
+    "branding": 113,
+    "3d": 114,
+    "paint": 115,
+    "scacchi": 116,
+    "progetto": 117
+  },
+  "acquisition": "Schermate native della landing locale, 6 ottobre 2026; ritaglio e normalizzazione a 24 fps."
+}

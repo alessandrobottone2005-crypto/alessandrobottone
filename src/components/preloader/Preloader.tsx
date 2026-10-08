@@ -20,7 +20,7 @@ function giaVisitato() {
 }
 
 export function Preloader() {
-  const { setPronto, setPreparaScena, entrato, voltoHeader } = useAvvio()
+  const { setPronto, setPreparaScena, setEntrato, entrato, voltoHeader, scenaAttiva } = useAvvio()
   const [finito, setFinito] = useState(false)
   const [stato, setStato] = useState<StatoVolto>('dorme')
   const radice = useRef<HTMLDivElement>(null)
@@ -30,7 +30,7 @@ export function Preloader() {
 
   // scroll bloccato e pagina in cima per tutta la durata del preloader
   useEffect(() => {
-    if (!location.pathname.startsWith('/progetti/')) scrollTo(0, 0)
+    if (!(location.pathname === '/progetti' || location.pathname.startsWith('/progetti/'))) scrollTo(0, 0)
     fermaScroll()
     return riprendiScroll
   }, [])
@@ -99,6 +99,7 @@ export function Preloader() {
 
       const chiudi = () => {
         setPronto(true)
+        setEntrato(true)
         setFinito(true)
       }
 
@@ -123,7 +124,7 @@ export function Preloader() {
   if (finito) return null
 
   return (
-    <div ref={radice} aria-hidden="true" className="fixed inset-0 z-50 flex items-center justify-center bg-nero">
+    <div ref={radice} style={{ visibility: scenaAttiva ? 'visible' : 'hidden' }} aria-hidden="true" className="fixed inset-0 z-50 flex items-center justify-center bg-nero">
       <div ref={involucro} className="will-change-transform">
         <Volto ref={volto} stato={stato} dimensione={misure.preloader} interattivo={false} />
       </div>

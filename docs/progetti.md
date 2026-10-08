@@ -1,5 +1,7 @@
 # progetti
 
+Dal 7 ottobre 2026 i contenuti si aprono nell’[archivio a tutta vista](archivio-progetti.md), fuori dal vetro del Macintosh. Schema e file sorgente restano invariati; i PDF ora scorrono in verticale. Le indicazioni precedenti sulle cartelle delle discipline e sullo sfogliamento sono storiche.
+
 per aggiungere un progetto basta creare una cartella: il sito la trova da solo. guida pratica passo passo: [come aggiungere un progetto](come-aggiungere-un-progetto.md). qui c’è come funziona dietro.
 
 ## la cartella
@@ -38,7 +40,7 @@ schema in `src/lib/schema.ts` (zod). non sono ammessi campi diversi da questi.
 
 | `tipo` | campi | note |
 |---|---|---|
-| `pdf` | `file` | pdf sfogliabile come un libro |
+| `pdf` | `file` | pdf verticale con zoom e pagine progressive |
 | `immagini` | `file` (un nome o un elenco), `layout` | `layout`: `piena` (predefinito, una sotto l’altra) o `griglia` (due colonne da tablet in su) |
 | `modello3d` | `file` | un `.glb` |
 | `video` | `file` **oppure** `url` (uno solo dei due), `poster`, `autoplay` | `url`: link vimeo o youtube. `autoplay` (predefinito `false`): muto e in loop, solo per clip brevi |

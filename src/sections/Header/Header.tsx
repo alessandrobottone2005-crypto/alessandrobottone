@@ -1,6 +1,9 @@
 // Dal segno al volume: il Canvas globale prende il posto dell’SVG nella terza fase.
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router'
 import { createPortal } from 'react-dom'
+import { PulsanteAudio } from '@/components/audio/PulsanteAudio'
+import { Bottone } from '@/components/bottoni/Bottone'
 import { useAvvio } from '@/components/preloader/AvvioContext'
 import { NomeMetallo } from '@/components/nome/NomeMetallo'
 import { NomePesoVariabile } from '@/components/testo/NomePesoVariabile'
@@ -24,7 +27,8 @@ const FINE = 100 - SALTO
 const INIZIO_FINALE = movimento.header.inizioNomeCompatto - SALTO
 
 export function Header() {
-  const { pronto, entrato, voltoHeader } = useAvvio()
+  const { pronto, entrato, voltoHeader, scenaAttiva } = useAvvio()
+  const navigate = useNavigate()
   const palco = useRef<HTMLDivElement>(null)
   const nome = useRef<HTMLDivElement>(null)
   const ritornoInizio = useRef<HTMLAnchorElement>(null)
@@ -39,7 +43,7 @@ export function Header() {
     return () => mq.removeEventListener('change', cambia)
   }, [])
   useEffect(() => {
-    if (!pronto || ridotto) return
+    if (!pronto || ridotto || !scenaAttiva) return
     let ritorno = 0
     const id = setInterval(() => {
       if (scrollY > 10) return
@@ -50,7 +54,7 @@ export function Header() {
       clearInterval(id)
       clearTimeout(ritorno)
     }
-  }, [pronto, ridotto])
+  }, [pronto, ridotto, scenaAttiva])
   useGSAP(
     () => {
       const q = gsap.utils.selector(palco)
@@ -235,18 +239,22 @@ export function Header() {
               <NomePesoVariabile testo={sito.cognome} className="block" pesoMin={900} pesoMax={900} />
             </span>
           </div>
-          {!ridotto && <NomeMetallo radice={nome} />}
+          {!ridotto && <NomeMetallo radice={nome} attivo={scenaAttiva} />}
           {pronto && entrato && (
-            <nav aria-label={sito.etichette.navigazione} className="navigazione-sezioni">
-              {([['portfolio', sito.sezioni.portfolio], ['chi-sono', sito.sezioni.chiSono], ['contatti', sito.sezioni.contatti]] as const).map(([id, testo]) => (
-                <a key={id} href={`#${id}`} onClick={(e) => {
-                  e.preventDefault()
-                  tornaA(id, true)
-                }}>{testo}</a>
+            <nav inert={!scenaAttiva} aria-hidden={!scenaAttiva || undefined} aria-label={sito.etichette.navigazione} className="navigazione-sezioni">
+              {([['progetti', sito.archivio.titolo], ['chi-sono', sito.sezioni.chiSono], ['contatti', sito.sezioni.contatti]] as const).map(([id, testo]) => (
+                <Bottone
+                  key={id}
+                  testo={testo}
+                  dimensione="small"
+                  className="shrink-0"
+                  onClick={() => id === 'progetti' ? navigate('/progetti') : tornaA(id, true)}
+                />
               ))}
+              <PulsanteAudio className="shrink-0" />
             </nav>
           )}
-          <div className="ritorno-inizio pointer-events-none fixed z-40">
+          <div inert={!scenaAttiva} aria-hidden={!scenaAttiva || undefined} className="ritorno-inizio pointer-events-none fixed z-40">
             <a
               ref={ritornoInizio}
               href="#header"

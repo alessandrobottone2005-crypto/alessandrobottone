@@ -1,3 +1,4 @@
+import { attivitaScena } from '@/lib/attivitaScena'
 // Portfolio: dopo l’header la camera scende verso il computer a terra e si ferma su monitor, tastiera e mouse.
 // Un clic (o tocco, o Invio) lo accende: la camera entra verso lo schermo, che si usa. Una volta acceso resta acceso.
 // Nessun pin: lo scroll avanza sempre; durante la sosta la camera resta ferma sull’inquadratura corrente.
@@ -206,6 +207,7 @@ function useNascondino() {
 
     const aspetta = () => {
       attesa = gsap.delayedCall(caso(S.nascostoMin, S.nascostoMax), () => esci())
+      attesa.paused(!attivitaScena.attiva)
     }
     const esci = (poi?: () => void) => {
       attesa?.kill()
@@ -227,8 +229,14 @@ function useNascondino() {
         ripeto = false
       })
     })
+    const smettiScena = attivitaScena.ascolta((attiva) => {
+      attesa?.paused(!attiva)
+      giro?.paused(!attiva)
+    })
     aspetta()
+
     return () => {
+      smettiScena()
       smetti()
       attesa?.kill()
       giro?.kill()

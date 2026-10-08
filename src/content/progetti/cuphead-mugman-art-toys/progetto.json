@@ -11,12 +11,12 @@
   "copertina": "copertina.webp",
   "blocchi": [
     {
-      "tipo": "pdf",
-      "file": "presentazione.pdf"
-    },
-    {
       "tipo": "modello3d",
       "file": "modello.glb"
+    },
+    {
+      "tipo": "pdf",
+      "file": "presentazione.pdf"
     },
     {
       "tipo": "testo",

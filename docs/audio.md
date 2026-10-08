@@ -1,3 +1,5 @@
+> Aggiornamento dell’8 ottobre 2026: [accesso immediato ai lavori](accesso-rapido.md). La scelta iniziale e l’archivio non caricano la scena; l’esperienza parte su richiesta. Questa descrizione prevale sulle indicazioni storiche di avvio e navigazione riportate sotto.
+
 # audio e ingresso
 
 Il sito ha una base musicale di sottofondo e i suoni del computer e dei glitch. I browser fanno partire l’audio solo dopo un gesto: per questo, a preloader finito, c’è il pulsante «inizia a scrollare».
@@ -36,7 +38,7 @@ Formati: `.webm` (opus) dove il browser lo dichiara sicuro, altrimenti `.m4a` (a
 
 ## pulsante audio
 
-`components/audio/PulsanteAudio.tsx`: `BottoneIcona` di Figma (48px) con le icone Lucide `Volume2`/`VolumeX`, fisso in basso a destra (16px su telefono, 32px da tablet, safe area di iOS), sopra la scena e lo schermo del computer (z-40, come il nome fisso). Compare dopo l’ingresso. `aria-label` «attiva audio» / «disattiva audio» e `aria-pressed` (premuto = audio attivo). Verificato a 390×844 e 1440×900: non copre i pulsanti dei contatti né il copyright.
+`components/audio/PulsanteAudio.tsx`: `Bottone` di Figma (misura small, 40px) con testo visibile «audio-on» / «audio-off», posizionato nella navbar in alto insieme ai link di navigazione (`Header.tsx`). Compare dopo l’ingresso. `aria-label` «attiva audio» / «disattiva audio» e `aria-pressed` (premuto = audio attivo).
 
 ## computer
 

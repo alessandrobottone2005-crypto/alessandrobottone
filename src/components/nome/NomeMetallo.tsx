@@ -16,12 +16,12 @@ class Protetto extends Component<{ children: ReactNode }, { rotto: boolean }> {
   }
 }
 
-export function NomeMetallo({ radice }: { radice: RefObject<HTMLElement | null> }) {
+export function NomeMetallo({ radice, attivo }: { radice: RefObject<HTMLElement | null>; attivo: boolean }) {
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-40">
       <Protetto>
         <Suspense fallback={null}>
-          <Nome3D radice={radice} />
+          <Nome3D radice={radice} attivo={attivo} />
         </Suspense>
       </Protetto>
     </div>

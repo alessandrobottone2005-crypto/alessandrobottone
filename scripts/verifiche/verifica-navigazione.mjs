@@ -26,10 +26,17 @@ for (const caso of casi) {
   }
   const foto = async (nome) => writeFileSync(join(out, `${caso.nome}-${nome}.png`), Buffer.from((await b.cmd('Page.captureScreenshot', { format: 'png' })).data, 'base64'))
   const vai = async (id) => {
-    await b.clic(`a[href="#${id}"]`)
+    if (id === 'portfolio') {
+      await b.valuta(`document.querySelector('.navigazione-sezioni button').click()`)
+      await b.aspetta(`!!document.querySelector('dialog.archivio[open]')`)
+      await b.valuta(`document.querySelector('button[aria-label="torna al computer"]').click()`)
+    } else {
+      await b.valuta(`(() => { const b = [...document.querySelectorAll('.navigazione-sezioni button')].find(b => b.textContent.includes(${JSON.stringify(id === 'chi-sono' ? 'chi sono' : id)})); b.click() })()`)
+    }
     await b.aspetta(`document.activeElement.id === ${JSON.stringify(id)}`)
     if (id === 'portfolio') await b.aspetta(`!!document.querySelector('[data-mac][data-fase="acceso"]:not([inert])')`)
   }
+
   try {
     if (caso.lenta) {
       await b.cmd('Network.enable')
@@ -37,9 +44,12 @@ for (const caso of casi) {
     }
     await b.cmd('Page.navigate', { url: caso.diretto ? `${url}progetti/dont-look-medusa` : url })
     await entra(b)
-    await b.aspetta(`document.querySelectorAll('.navigazione-sezioni a').length === 3`)
-    await check(`[...document.querySelectorAll('.navigazione-sezioni a')].every(a => a.getBoundingClientRect().height >= 44)`, 'bersagli touch da 44px')
-    if (caso.diretto) await b.aspetta(`!!document.querySelector('[data-mac]:not([inert]) [role="dialog"]')`)
+    if (caso.diretto) {
+      await b.aspetta(`!!document.querySelector('dialog.archivio[open]')`)
+      await b.valuta(`document.querySelector('button[aria-label="torna al computer"]').click()`)
+    }
+    await b.aspetta(`document.querySelectorAll('.navigazione-sezioni button').length >= 3 && !document.querySelector('main').inert`)
+    await check(`[...document.querySelectorAll('.navigazione-sezioni button')].every(a => a.getBoundingClientRect().height >= 44)`, 'bersagli touch da 44px')
     if (caso.nome === 'desktop') {
       await b.valuta(`scrollTo(0, document.querySelector('#portfolio > div').getBoundingClientRect().top + scrollY + innerHeight * 1.6)`)
       await b.aspetta(`getComputedStyle(document.querySelector('button[aria-label="accendi il computer"]')).visibility === 'visible'`)
@@ -51,15 +61,12 @@ for (const caso of casi) {
     await attesa(250)
     await foto('computer')
     if (caso.telefono) await check(`document.querySelector('.mac-barra').getBoundingClientRect().top >= document.querySelector('.navigazione-sezioni').getBoundingClientRect().bottom`, 'Finder libero sotto navbar')
-    if (!caso.diretto) {
-      await b.valuta(`document.querySelector('[data-icona="cartella:illustrazione"]').focus({preventScroll:true})`)
-      await tasto('Enter')
-      await b.aspetta(`!!document.querySelector('[role="dialog"]')`)
-      await b.valuta(`document.querySelector('[data-icona="file:dont-look-medusa"]').focus({preventScroll:true})`)
-      await tasto('Enter')
-      await b.aspetta(`location.pathname === '/progetti/dont-look-medusa' && document.querySelectorAll('[role="dialog"]').length === 2`)
-      await b.valuta(`document.querySelector('[data-mac]').dataset.provaConservazione = 'si'`)
-    }
+    // Le schede ora vivono nell’archivio: la loro navigazione è coperta da verifica-archivio.
+    // Qui controlliamo che le applicazioni del Finder sopravvivano allo scroll della home.
+    await b.valuta(`document.querySelector('[data-icona="app:scacchi"]').focus({preventScroll:true})`)
+    await tasto('Enter')
+    await b.aspetta(`!!document.querySelector('.mac-finestra')`)
+    await b.valuta(`document.querySelector('[data-mac]').dataset.provaConservazione = 'si'`)
     const rotta = await b.valuta('location.pathname')
     const finestre = await b.valuta(`document.querySelectorAll('[role="dialog"]').length`)
     await vai('chi-sono')

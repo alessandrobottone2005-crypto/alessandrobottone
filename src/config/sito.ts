@@ -47,7 +47,7 @@ export const sito = {
   },
   // il computer del portfolio: menu e finestre in stile finder 1984, tutto in minuscolo
   computer: {
-    schermo: 'computer del portfolio: cartelle dei progetti divise per disciplina',
+    schermo: 'computer del portfolio: progetti, scacchi, paint e dediche',
     scrivania: 'scrivania',
     menu: { volto: 'menu del volto', archivio: 'archivio', vista: 'vista', speciale: 'speciale' },
     voci: {
@@ -88,7 +88,7 @@ export const sito = {
     paginaSuccessiva: 'pagina successiva',
     schermoIntero: 'schermo intero',
     esciSchermoIntero: 'esci dallo schermo intero',
-    pdf: (titolo: string) => `documento di ${titolo}, sfogliabile`,
+    pdf: (titolo: string) => `documento di ${titolo}, pagine a scorrimento verticale`,
     pdfErrore: 'impossibile aprire il documento',
     modello: (titolo: string) => `modello 3d di ${titolo}, ruotabile`,
     ripristinaVista: 'ripristina la vista',
@@ -100,6 +100,33 @@ export const sito = {
     video: (titolo: string) => `video di ${titolo}`,
   },
   // applicazioni sulla scrivania del computer (docs/computer.md#applicazioni)
+  archivio: {
+    titolo: 'progetti',
+    computer: 'torna al computer',
+    computerBreve: 'computer',
+    archivioBreve: 'archivio',
+    adattaBreve: 'adatta',
+    indietro: 'torna all’archivio',
+    tutti: 'tutti',
+    filtri: 'filtra per disciplina',
+    vuoto: 'nessun progetto in questa disciplina.',
+    conteggio: (n: number) => `${n} ${n === 1 ? 'progetto' : 'progetti'}`,
+    apri: (titolo: string) => `apri ${titolo}`,
+    ingrandisci: (titolo: string) => `ingrandisci ${titolo}`,
+    chiudiImmagine: 'chiudi immagine',
+    adatta: 'adatta alla larghezza',
+    aumenta: 'aumenta zoom',
+    diminuisci: 'diminuisci zoom',
+    zoom: 'zoom',
+    originale: 'apri pdf originale',
+    caricamento: 'caricamento…',
+    errore: 'il contenuto non si è caricato.',
+    riprova: 'riprova',
+    ricarica: 'ricarica progetto',
+    modelloNonDisponibile: 'il visualizzatore 3d non è disponibile in questo browser. puoi consultare la presentazione o aprire il file originale.',
+    modelloOriginale: 'apri file 3d',
+    pagina: (n: number, totale: number) => `pagina ${n} di ${totale}`,
+  },
   app: {
     caricamento: 'caricamento…',
     errore: 'l’applicazione non si apre. riprova più tardi.',
@@ -184,10 +211,14 @@ export const sito = {
 // ingresso nel sito (docs/audio.md): il pulsante che sblocca lo scroll e avvia l’audio
 export const ingresso = {
   pulsante: 'inizia a scrollare',
+  progetti: 'vedi progetti',
+  descrizione: 'graphic e brand designer · branding, illustrazione e 3d',
 } as const
 
-// pulsante dell’audio, fisso in basso a destra
+// pulsante dell’audio, nella navbar in alto
 export const audio = {
   attiva: 'attiva audio',
   disattiva: 'disattiva audio',
+  on: 'audio-on',
+  off: 'audio-off',
 } as const

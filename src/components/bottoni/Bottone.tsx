@@ -1,6 +1,6 @@
 // bottone a pillola con testo (figma: button_atoms, misure small / medium / big).
 // il testo rotola al passaggio; se cambia (es. "email" → "copiata") la nuova parola sale al posto della vecchia.
-// attenzione: small (40px) e medium (48px) sono sotto l’area toccabile minima su mobile (48px, claude.md §12).
+// small (44px) soddisfa il minimo WCAG 2.2 per i bersagli touch; medium (48px) e big (56px) lo superano.
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { RotolaAlPassaggio } from '@/components/testo/RotolaAlPassaggio'
 import { movimento } from '@/config/movimento'
@@ -9,7 +9,7 @@ import { BaseBottone, type PropsBase } from './BaseBottone'
 export type MisuraBottone = 'small' | 'medium' | 'big'
 
 const FORMA: Record<MisuraBottone, string> = {
-  small: 'h-10 w-full px-[18px] text-bottone-s rounded-pillola',
+  small: 'h-11 w-full px-[18px] text-bottone-s rounded-pillola',
   medium: 'h-12 w-full px-6 text-bottone-m rounded-pillola',
   big: 'h-14 w-full px-8 text-bottone-l rounded-pillola',
 }

@@ -70,7 +70,7 @@ export default function Volto3D({ riferimento, controllo, attivo = true }: Props
   return (
     <Canvas
       shadows={edificio && 'percentage'}
-      frameloop="demand"
+      frameloop={attivo ? 'demand' : 'never'}
       dpr={riferimento ? [1, 1.5] : qualita.valori.dpr}
       // home: campo 40° (si vede la sala); laboratorio: la vista frontale di sempre
       camera={riferimento ? { fov: 18, position: [0, 0, 20], near: 1, far: 60 } : { fov: CAMPO, position: CAMERA.toArray(), near: 0.5, far: 200 }}

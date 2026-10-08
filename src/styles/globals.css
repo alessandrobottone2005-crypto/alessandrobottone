@@ -237,7 +237,7 @@ html[data-grana-webgl] .grana {
 /* Navigazione disponibile dopo il gesto d’ingresso, fuori dai contenitori con pin. */
  :root {
   --safe-top: env(safe-area-inset-top, 0px);
-  --nav-bottom: calc(var(--safe-top) + 136px);
+  --nav-bottom: calc(var(--safe-top) + 188px);
 }
 .navigazione-sezioni {
   position: fixed;
@@ -246,31 +246,31 @@ html[data-grana-webgl] .grana {
   left: max(16px, env(safe-area-inset-left));
   right: max(16px, env(safe-area-inset-right));
   display: flex;
-  justify-content: center;
-  gap: 4px;
-  color: var(--color-bianco);
-}
-.navigazione-sezioni a {
-  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 0 12px;
-  border-radius: 2px;
-  background: rgb(20 20 20 / .8);
-  font-size: 14px;
-  font-weight: 500;
-  transition: background .2s, color .2s, box-shadow .2s;
-}
-.navigazione-sezioni a:hover,
-.navigazione-sezioni a:focus-visible {
-  background: var(--color-bianco);
-  color: var(--color-nero);
-  box-shadow: var(--shadow-bagliore);
+  gap: 8px;
+  color: var(--color-bianco);
 }
 .ritorno-inizio { top: calc(var(--safe-top) + 20px); right: max(16px, env(safe-area-inset-right)); }
+@media (orientation: landscape) and (max-height: 500px) {
+  :root { --nav-bottom: calc(var(--safe-top) + 88px); }
+  .navigazione-sezioni { top: calc(var(--safe-top) + 16px); }
+}
 @media (min-width: 768px) {
   :root { --nav-bottom: calc(var(--safe-top) + 88px); }
   .navigazione-sezioni { top: calc(var(--safe-top) + 24px); left: max(24px, env(safe-area-inset-left)); right: auto; justify-content: flex-start; }
   .ritorno-inizio { top: calc(var(--safe-top) + 28px); right: max(28px, env(safe-area-inset-right)); }
 }
+
+/* Un ingresso leggero, con la stessa tipografia e palette della home. */
+.ingresso-rapido { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; justify-content: space-between; gap: 2rem; padding: max(2rem, env(safe-area-inset-top)) clamp(1.25rem, 6vw, 7rem) max(2rem, env(safe-area-inset-bottom)); overflow-y: auto; background: var(--color-nero); color: var(--color-bianco); }
+.ingresso-identita { margin-block: auto; }
+.ingresso-identita h1 { font-size: clamp(3.4rem, min(12vw, 18svh), 12rem); line-height: .88; letter-spacing: -.06em; font-weight: 900; }
+.ingresso-identita p { margin-top: 2rem; max-width: 35rem; font-size: clamp(1rem, 2vw, 1.5rem); text-wrap: balance; }
+.ingresso-azioni { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.ingresso-progetti { display: inline-flex; justify-content: center; align-items: center; min-height: 56px; border: 1.5px solid var(--color-bianco); border-radius: 100px; padding: .75rem 2rem; background: var(--color-bianco); color: var(--color-nero); font-size: 1.125rem; }
+.ingresso-progetti:hover { background: var(--color-nero); color: var(--color-bianco); }
+.ingresso-esperienza button { background: transparent; color: var(--color-bianco); }
+.caricamento-interfaccia { position: fixed; inset: 0; z-index: 50; display: grid; place-content: center; background: var(--color-nero); color: var(--color-bianco); }
+@media (max-width: 599px) { .ingresso-azioni { flex-direction: column; align-items: stretch; } .ingresso-esperienza { width: 100%; } }

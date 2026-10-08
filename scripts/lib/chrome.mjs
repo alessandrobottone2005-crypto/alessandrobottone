@@ -26,7 +26,11 @@ export async function apriChrome({ telefono = false, width = telefono ? 390 : 14
       chrome.kill()
       await Promise.race([uscito, attesa(2000)])
     }
-    rmSync(profilo, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 })
+    // I processi figli di Chrome possono completare le scritture dopo l’uscita del processo principale.
+    for (let tentativo = 0; tentativo < 10; tentativo++) {
+      try { rmSync(profilo, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 }); break }
+      catch (e) { if (tentativo === 9) console.warn('profilo temporaneo ancora occupato:', profilo, e.code); else await attesa(300) }
+    }
   }
   try {
     let pagina
@@ -89,7 +93,7 @@ export async function apriChrome({ telefono = false, width = telefono ? 390 : 14
 
 export async function entra(browser) {
   const { aspetta, valuta, cmd } = browser
-  await aspetta(`document.querySelector('main')?.getAttribute('aria-busy') === 'false'`)
+  await aspetta(`!!document.querySelector('.ingresso-rapido') || !!document.querySelector('dialog.archivio[open]') || !!document.querySelector('.navigazione-sezioni')`)
   const p = await valuta(`(() => {
     const b = [...document.querySelectorAll('button')].find(b => b.textContent.includes('inizia a scrollare'));
     if (!b) return null; const r = b.getBoundingClientRect(); return { x:r.x+r.width/2,y:r.y+r.height/2 };
@@ -98,5 +102,5 @@ export async function entra(browser) {
     await cmd('Input.dispatchMouseEvent', { type: 'mousePressed', ...p, button: 'left', clickCount: 1 })
     await cmd('Input.dispatchMouseEvent', { type: 'mouseReleased', ...p, button: 'left', clickCount: 1 })
   }
-  await aspetta(`!!document.querySelector('main') && !document.documentElement.classList.contains('scroll-fermo') && !document.querySelector('main').inert`)
+  await aspetta(`!!document.querySelector('dialog.archivio[open]') || (!!document.querySelector('.navigazione-sezioni') && !document.querySelector('main').inert && !document.documentElement.classList.contains('scroll-fermo'))`)
 }

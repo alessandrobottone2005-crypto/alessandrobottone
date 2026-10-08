@@ -44,6 +44,13 @@ sorgenti/sala/export/*.exr
 sorgenti/sala/export/Sala_Web.glb
 sorgenti/sala/textures/
 *.blend[0-9]*
+# acquisizioni e fotogrammi intermedi della scena Blender completa (restano sul disco)
+sorgenti/landing/interfacce/avvio-pagina-*.jpg
+sorgenti/landing/interfacce/boot-*.png
+sorgenti/landing/interfacce/*-pagina.jpg
+sorgenti/landing/interfacce/*-pagina.png
+sorgenti/landing/interfacce/avvio-??.jpg
+sorgenti/landing/interfacce/desktop.jpg
 
 # bytecode degli script Python
 __pycache__/

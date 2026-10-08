@@ -1,3 +1,4 @@
+import { attivitaScena } from './attivitaScena'
 // Glitch casuali del sito: il pianificatore sceglie ogni tanto un bersaglio (logo, ologramma o camera)
 // e lo annuncia; chi disegna il bersaglio ascolta e anima il disturbo, il motore audio lo fa sentire.
 // Rari e brevi (12–25 s, 0,2–0,5 s, mai più di 3 lampi al secondo), spenti con movimento ridotto,
@@ -141,7 +142,7 @@ export function avviaGlitch() {
     clearTimeout(timer)
     timer = 0
   }
-  const puo = () => audio.avviato && !document.hidden && !mq.matches
+  const puo = () => attivitaScena.attiva && audio.avviato && !document.hidden && !mq.matches
   const programma = (secondi: number) => {
     ferma()
     if (puo()) timer = window.setTimeout(scatta, secondi * 1000)
@@ -171,7 +172,7 @@ export function avviaGlitch() {
     if (suono) window.setTimeout(() => suono.ferma(0.04), g.durata * 1000)
   })
   const cambia = () => {
-    if (mq.matches || document.hidden) {
+    if (!attivitaScena.attiva || mq.matches || document.hidden) {
       ferma()
       // un glitch in corso si spegne subito
       for (const b of Object.keys(glitchAttivi) as BersaglioGlitch[]) delete glitchAttivi[b]
@@ -180,6 +181,7 @@ export function avviaGlitch() {
   const smettiAudio = audio.ascolta(() => {
     if (audio.avviato && !timer) programma(tra(G.intervallo))
   })
+  const smettiScena = attivitaScena.ascolta(cambia)
   mq.addEventListener('change', cambia)
   document.addEventListener('visibilitychange', cambia)
   programma(tra(G.intervallo))
@@ -188,6 +190,7 @@ export function avviaGlitch() {
     ferma()
     smettiDiAscoltare()
     smettiAudio()
+    smettiScena()
     mq.removeEventListener('change', cambia)
     document.removeEventListener('visibilitychange', cambia)
   }

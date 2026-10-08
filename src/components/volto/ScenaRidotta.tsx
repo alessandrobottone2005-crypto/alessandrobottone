@@ -1,5 +1,6 @@
 // Movimento ridotto: stessa stanza e stesso computer, inquadratura ferma davanti allo schermo acceso.
 // Nessun volto, volume e polvere fermi: la scena si disegna solo quando cambia qualcosa.
+import { useAvvio } from '@/components/preloader/AvvioContext'
 import { Canvas } from '@react-three/fiber'
 import { Component, Suspense, type ReactNode } from 'react'
 import * as THREE from 'three'
@@ -23,10 +24,11 @@ export default function ScenaRidotta() {
 }
 
 function Scena() {
+  const { scenaAttiva } = useAvvio()
   return (
     <Canvas
       shadows={salaAttiva && 'percentage'}
-      frameloop="demand"
+      frameloop={scenaAttiva ? 'demand' : 'never'}
       dpr={[1, 1.5]}
       camera={{ fov: CAMPO, position: CAMERA.toArray(), near: 0.5, far: 200 }}
       gl={{ antialias: true, alpha: true, toneMapping: THREE.AgXToneMapping }}

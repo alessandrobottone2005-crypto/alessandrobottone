@@ -1,4 +1,8 @@
+> Aggiornamento dell’8 ottobre 2026: [accesso immediato ai lavori](accesso-rapido.md). La scelta iniziale e l’archivio non caricano la scena; l’esperienza parte su richiesta. Questa descrizione prevale sulle indicazioni storiche di avvio e navigazione riportate sotto.
+
 # computer
+
+**Aggiornamento 7 ottobre 2026:** la navigazione dei lavori descritta sotto nelle cartelle e finestre del Finder è sostituita dall’[archivio progetti a tutta vista](archivio-progetti.md). Sul desktop resta una sola cartella «progetti», aperta con un clic. I PDF scorrono in verticale. Scena, accensione e applicazioni conservano il comportamento descritto qui.
 
 Il portfolio è una postazione Macintosh 128K con scrivania di legno, tastiera, mouse, libri e accessori nella sala di cemento, nel fascio di luce della fessura. Dal 6 ottobre 2026 sostituisce il vecchio PC a terra. Dopo l’header la camera abbassa lo sguardo e scende fino a inquadrare la postazione completa. Il computer è spento: si accende con un clic (o tocco) sul monitor o sul mouse 3d, o con Invio su un pulsante invisibile sopra il monitor; parte la sequenza di avvio e la camera entra verso lo schermo. Una volta acceso resta acceso. Sullo schermo c’è un’interfaccia che riprende il Finder del Macintosh 1984: scrivania con una cartella per disciplina (illustrazione, branding, 3d; web design torna con `webDesignAttivo` in `src/config/discipline.ts`) e, dentro, un documento per progetto. Sulla scrivania ci sono anche tre applicazioni: «scacchi», «paint» e «dediche» ([applicazioni](#applicazioni)).
 

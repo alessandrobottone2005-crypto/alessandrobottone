@@ -81,7 +81,7 @@ se qualcosa non va, leggi il messaggio: dice esattamente quale progetto e quale 
 npm run dev
 ```
 
-Apri [localhost:5173](http://localhost:5173): scendi fino al computer, apri la cartella della disciplina e il documento del progetto (doppio clic). Verifica titolo, discipline, anno, descrizione e blocchi nella finestra. Prova anche il link diretto `http://localhost:5173/progetti/<nome-progetto>` con lo slug effettivo, e i formati desktop/telefono.
+Apri [localhost:5173](http://localhost:5173): scendi fino al computer e apri «progetti» con un clic, poi scegli la copertina nell’archivio a tutta vista. Verifica titolo, discipline, anno, descrizione e blocchi nella finestra. Prova anche il link diretto `http://localhost:5173/progetti/<nome-progetto>` con lo slug effettivo, e i formati desktop/telefono.
 
 ## 7. pubblica il sito
 

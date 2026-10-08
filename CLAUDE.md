@@ -1,3 +1,7 @@
+> Aggiornamento dell’8 ottobre 2026: [accesso immediato ai lavori](docs/accesso-rapido.md). La scelta iniziale e l’archivio non caricano la scena; l’esperienza parte su richiesta. Questa descrizione prevale sulle indicazioni storiche di avvio e navigazione riportate sotto.
+
+> Aggiornamento del 7 ottobre 2026: per l’area progetti prevale il piano approvato dell’[archivio a tutta vista](docs/archivio-progetti.md). Una cartella «progetti» sostituisce le cartelle delle discipline; apre `/progetti`, fuori dal vetro CRT. Schede `/progetti/:slug`, PDF verticali con zoom, ChicagoFLF e palette Macintosh anche nell’archivio. La home si ferma dietro il dialog, il contenuto visibile continua a scorrere. Le descrizioni precedenti di cartelle, finestra nel monitor e page-flip sono storiche. App e altre sezioni restano invariate. Nessuna autorizzazione a pubblicare questo intervento.
+
 # CLAUDE.md — portfolio di alessandro bottone
 
 Brief operativo aggiornato al 6 ottobre 2026. Le sezioni seguenti descrivono il sito attuale; lo storico in fondo conserva anche scelte poi sostituite. Per la guida pratica parti da [README.md](README.md).
@@ -102,7 +106,7 @@ Dettagli e parametri: [animazioni](docs/animazioni.md), [ambiente 3d](docs/ambie
 
 ### 6.8 audio e glitch
 
-Base techno in loop (`public/audio/musica.*`, da `sorgenti/audio/monume-techno-570702.mp3`, Pixabay; `npm run prepara-audio`) al 35% dopo l’ingresso, scaricata dopo il preloader; si abbassa davanti al computer acceso, dove parte la ventola. Rumori del computer e dei glitch da registrazioni CC0 di Freesound (crediti in `sorgenti/audio/README.md`). Pulsante audio (`BottoneIcona`, «attiva audio»/«disattiva audio») sempre in basso a destra; la scelta è ricordata; con scheda nascosta l’audio si ferma. Glitch casuali (`src/lib/glitch.ts`): uno ogni 12–25s, 0,2–0,5s, tra logo, ologramma (più spesso) e camera, sempre con il suono; mai più di 3 lampi al secondo, mai mentre si usa il computer acceso, spenti con movimento ridotto e scheda nascosta. [Audio](docs/audio.md), [animazioni](docs/animazioni.md#glitch).
+Base techno in loop (`public/audio/musica.*`, da `sorgenti/audio/monume-techno-570702.mp3`, Pixabay; `npm run prepara-audio`) al 35% dopo l’ingresso, scaricata dopo il preloader; si abbassa davanti al computer acceso, dove parte la ventola. Rumori del computer e dei glitch da registrazioni CC0 di Freesound (crediti in `sorgenti/audio/README.md`). Pulsante audio (`Bottone` di testo, «audio-on»/«audio-off», «attiva audio»/«disattiva audio» per lettori di schermo) nella navbar in alto; la scelta è ricordata; con scheda nascosta l’audio si ferma. Glitch casuali (`src/lib/glitch.ts`): uno ogni 12–25s, 0,2–0,5s, tra logo, ologramma (più spesso) e camera, sempre con il suono; mai più di 3 lampi al secondo, mai mentre si usa il computer acceso, spenti con movimento ridotto e scheda nascosta. [Audio](docs/audio.md), [animazioni](docs/animazioni.md#glitch).
 
 ## 7. cursore
 

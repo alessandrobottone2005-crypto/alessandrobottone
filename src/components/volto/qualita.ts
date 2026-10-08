@@ -1,3 +1,4 @@
+import { attivitaScena } from '@/lib/attivitaScena'
 // qualità adattiva della scena (claude.md §2 regola 7): stessa scena e stessi effetti su ogni dispositivo,
 // ma se i fotogrammi non stanno nei 60fps scende la risoluzione interna (prima nebbia, poi riflesso, poi dpr).
 // ?qualita=0..3 fissa un livello per le prove.
@@ -41,7 +42,7 @@ export function limitaFrame(invalidate: () => void) {
   let ultimo = -Infinity
   return () => {
     const ora = performance.now()
-    if (document.hidden || ora - ultimo < 1000 / qualita.fps - 0.5) return false
+    if (!attivitaScena.attiva || document.hidden || ora - ultimo < 1000 / qualita.fps - 0.5) return false
     ultimo = ora
     invalidate()
     return true

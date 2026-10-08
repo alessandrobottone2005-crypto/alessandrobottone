@@ -1,4 +1,8 @@
+> Aggiornamento dell’8 ottobre 2026: [accesso immediato ai lavori](accesso-rapido.md). La scelta iniziale e l’archivio non caricano la scena; l’esperienza parte su richiesta. Questa descrizione prevale sulle indicazioni storiche di avvio e navigazione riportate sotto.
+
 # architettura
+
+**Aggiornamento 7 ottobre 2026:** la presentazione dei progetti passa all’[archivio a tutta vista](archivio-progetti.md), separato dal Finder. Sono valide `/`, `/progetti` e `/progetti/:slug`; la home resta montata. Le descrizioni precedenti di finestre progetto dentro il monitor sono storiche.
 
 Il sito separa racconto della home, scena immersiva e interfaccia del computer con le finestre dei progetti. Testi e parametri hanno una fonte condivisa; le pose 3d vengono aggiornate senza render React a ogni fotogramma.
 

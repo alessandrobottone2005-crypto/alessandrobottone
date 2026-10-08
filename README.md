@@ -1,3 +1,5 @@
+> Aggiornamento dell’8 ottobre 2026: [accesso immediato ai lavori](docs/accesso-rapido.md). La scelta iniziale e l’archivio non caricano la scena; l’esperienza parte su richiesta. Questa descrizione prevale sulle indicazioni storiche di avvio e navigazione riportate sotto.
+
 # portfolio di alessandro bottone
 
 Portfolio one-page in italiano, raccontato dallo scroll. Il volto parte come segno e diventa un logo metallico 3d animato nell’ambiente della scena Blender V2.
@@ -5,7 +7,7 @@ Portfolio one-page in italiano, raccontato dallo scroll. Il volto parte come seg
 **preloader → header → portfolio → chi sono → contatti**
 
 - Header con tre discipline attive; il nome grande si raccoglie in alto a destra e resta cliccabile per tornare all’inizio.
-- Portfolio dentro una postazione Macintosh 128K con scrivania e accessori in una sala di cemento realistica (luce cotta in Blender, pavimento bagnato che riflette, polvere nel fascio di sole): la camera scende fino allo schermo, il computer si accende e si usa. L’interfaccia riprende il Finder del Macintosh 1984 (bianco e nero, ChicagoFLF): una cartella per disciplina attiva, un documento per progetto, finestre con copertina a colori, informazioni e blocchi. Il volto metallico sta dietro il monitor, gioca a nascondino e reagisce a cartelle e progetti.
+- Portfolio dentro una postazione Macintosh 128K con scrivania e accessori in una sala di cemento realistica (luce cotta in Blender, pavimento bagnato che riflette, polvere nel fascio di sole): la camera scende fino allo schermo, il computer si accende e si usa. L’interfaccia riprende il Finder del Macintosh 1984 (bianco e nero, ChicagoFLF): una cartella «progetti» apre l’archivio a tutta vista, con filtri per disciplina, copertine grandi e PDF verticali con zoom; le app restano nel monitor. Il volto metallico sta dietro il monitor, gioca a nascondino e reagisce a cartelle e progetti.
 - Biografia invariata, rivelata parola per parola; a sinistra il logo si trasforma in un avatar a punti che segue il cursore; contatti con logo grande, Instagram, Behance, email e copyright.
 
 La stessa esperienza 3d è presente su mobile. Su telefono l’interfaccia occupa tutta la vista. Con movimento ridotto: SVG statici, scroll nativo e computer già acceso in una scena ferma. In caso di errore WebGL restano il volto SVG e l’interfaccia del computer. Progetti pubblicati: dai tre fuochi, lorenzo e serena brancale (branding); arabian sunset, donne selvagge, don’t look medusa, dove la guerra non arriva e inktober (illustrazione); cuphead e mugman · art toys (3d).
@@ -73,12 +75,14 @@ Repository: [alessandrobottone](https://github.com/alessandrobottone2005-crypto/
 | [ambiente 3d](docs/ambiente-3d.md) | sala di cemento, luce cotta, riflessi, post-produzione ed esportazione |
 | [animazioni](docs/animazioni.md) | comportamento e parametri delle sezioni |
 | [progetti](docs/progetti.md) | schema JSON, caricamento e script |
+| [archivio progetti](docs/archivio-progetti.md) | archivio a tutta vista, filtri, immagini e PDF con zoom |
 | [computer](docs/computer.md) | discesa, interfaccia finder 1984, finestre, cinque tipi di blocco e crediti |
 | [accessibilità e prestazioni](docs/accessibilita-prestazioni.md) | tastiera, movimento ridotto, fallback e limiti delle misure |
 | [pubblicazione](docs/pubblicazione.md) | GitHub, Vercel, asset pubblici e verifiche |
 | [sorgenti Blender](sorgenti/logo-3d/README.md) | scene, controlli, rigenerazione e licenze |
 | [sorgenti del computer](sorgenti/computer/README.md) | postazione Macintosh, originali, rigenerazione e licenze |
 | [sorgenti della sala](sorgenti/sala/README.md) | scena Blender, cottura, rigenerazione e licenza |
+| [scena Blender completa della landing](sorgenti/landing/README.md) | stanza, Macintosh, interfacce incorporate, logo animato e camere per render autonomi |
 | [CLAUDE.md](CLAUDE.md) | brief operativo e storico delle decisioni |
 
 

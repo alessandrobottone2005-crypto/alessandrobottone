@@ -15,7 +15,26 @@ import { sito } from '@/config/sito'
 
 type Props = { file: string; titolo: string }
 
-export default function Modello3D({ file, titolo }: Props) {
+let supportaWebGL: boolean | undefined
+function haWebGL() {
+  if (supportaWebGL !== undefined) return supportaWebGL
+  try {
+    const gl = document.createElement('canvas').getContext('webgl2')
+    supportaWebGL = Boolean(gl)
+    gl?.getExtension('WEBGL_lose_context')?.loseContext()
+  } catch { supportaWebGL = false }
+  return supportaWebGL
+}
+
+export default function Modello3D(props: Props) {
+  const [disponibile] = useState(haWebGL)
+  return disponibile ? <ModelloInterattivo {...props} /> : <div className="archivio-errore" data-modello-fallback role="status">
+    <p>{sito.archivio.modelloNonDisponibile}</p>
+    <a href={props.file} target="_blank" rel="noreferrer">{sito.archivio.modelloOriginale}</a>
+  </div>
+}
+
+function ModelloInterattivo({ file, titolo }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const controlli = useRef<ComponentRef<typeof OrbitControls>>(null)
   const [montato, setMontato] = useState(false)

@@ -122,12 +122,16 @@ export function avviaScroll() {
 }
 
 /** blocca lo scroll della pagina (preloader) */
-export function fermaScroll() {
+const blocchiScroll = new Set<string>()
+export function fermaScroll(motivo = 'avvio') {
+  blocchiScroll.add(motivo)
   lenis?.stop()
   document.documentElement.classList.add('scroll-fermo')
 }
 
-export function riprendiScroll() {
+export function riprendiScroll(motivo = 'avvio') {
+  blocchiScroll.delete(motivo)
+  if (blocchiScroll.size) return
   document.documentElement.classList.remove('scroll-fermo')
   lenis?.start()
 }

@@ -1,0 +1,138 @@
+{
+  "blender": "5.2.2 LTS",
+  "file": "/Volumes/SSD_ALE/Portfolio2026/Projects/alessandrobottone/sorgenti/landing/Landing_Completa.blend",
+  "objects": 135,
+  "collections": [
+    "01 \u00b7 stanza brutalista",
+    "02 \u00b7 postazione Macintosh",
+    "03 \u00b7 logo e controlli",
+    "04 \u00b7 illuminazione",
+    "05 \u00b7 atmosfera e pulviscolo",
+    "06 \u00b7 camere della landing",
+    "07 \u00b7 schermo e interfacce"
+  ],
+  "packed_images": [
+    "ConcreteFloor_Normal_2k.jpg",
+    "ConcreteWall_Normal_2k.png",
+    "Image_1.001",
+    "Image_10",
+    "Image_12",
+    "Image_13",
+    "Image_14",
+    "Image_15",
+    "Image_16",
+    "Image_2",
+    "Image_3",
+    "Image_4",
+    "Image_5",
+    "Image_6",
+    "Image_7",
+    "Image_8",
+    "Image_9",
+    "MetalloGrezzo_BaseColor",
+    "MetalloGrezzo_NormalGL",
+    "MetalloGrezzo_Roughness",
+    "sala_pareti_colore",
+    "sala_pareti_rugosita",
+    "sala_pavimento_colore",
+    "sala_pavimento_rugosita",
+    "schermo-atlante.png"
+  ],
+  "screen_states": {
+    "spento": 0,
+    "desktop": 111,
+    "illustrazione": 112,
+    "branding": 113,
+    "3d": 114,
+    "paint": 115,
+    "scacchi": 116,
+    "progetto": 117
+  },
+  "logo_location": [
+    3.7102081775665283,
+    24.6816349029541,
+    3.1318111419677734
+  ],
+  "logo_scale": 0.3117007315158844,
+  "cameras": {
+    "01 \u00b7 landing \u00b7 postazione ampia": {
+      "eye": [
+        3.710206985473633,
+        15.363898277282715,
+        4.229190826416016
+      ],
+      "rotation": [
+        1.2740904092788696,
+        -0.0,
+        0.0
+      ],
+      "vertical_fov": 39.99999883637168
+    },
+    "02 \u00b7 landing \u00b7 dettaglio del monitor": {
+      "eye": [
+        3.710206985473633,
+        21.57460594177246,
+        2.8343851566314697
+      ],
+      "rotation": [
+        1.5219206809997559,
+        -0.0,
+        0.0
+      ],
+      "vertical_fov": 39.99999883637168
+    },
+    "03 \u00b7 landing \u00b7 vista generale della sala": {
+      "eye": [
+        0.0,
+        -13.440567016601562,
+        9.5
+      ],
+      "rotation": [
+        1.5707964897155762,
+        -0.0,
+        0.0
+      ],
+      "vertical_fov": 39.99999883637168
+    },
+    "04 \u00b7 landing \u00b7 discesa sopra la scrivania": {
+      "eye": [
+        3.710206985473633,
+        10.315889358520508,
+        12.0
+      ],
+      "rotation": [
+        0.9081745147705078,
+        -0.0,
+        0.0
+      ],
+      "vertical_fov": 39.99999883637168
+    },
+    "05 \u00b7 landing \u00b7 header": {
+      "eye": [
+        0.0,
+        32.839256286621094,
+        9.0
+      ],
+      "rotation": [
+        1.5707964897155762,
+        -0.0,
+        0.0
+      ],
+      "vertical_fov": 39.99999883637168
+    },
+    "06 \u00b7 verifica \u00b7 postazione 976x1072": {
+      "eye": [
+        3.710206985473633,
+        15.294299125671387,
+        4.250469207763672
+      ],
+      "rotation": [
+        1.2740904092788696,
+        -0.0,
+        0.0
+      ],
+      "vertical_fov": 39.99999883637168
+    }
+  },
+  "source_geometry_preserved": true
+}

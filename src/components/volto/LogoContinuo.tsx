@@ -51,7 +51,7 @@ function Riserva() {
   )
 }
 export function LogoContinuo() {
-  const { pronto, preparaScena } = useAvvio()
+  const { pronto, preparaScena, scenaAttiva } = useAvvio()
   const { azione, ridotto } = useVolto()
   useEffect(() => {
     if (!pronto || ridotto) return
@@ -70,7 +70,7 @@ export function LogoContinuo() {
     <div data-logo-continuo aria-hidden="true" className="pointer-events-none fixed inset-0 z-10">
       <ScenaProtetta>
         <Suspense fallback={<Riserva />}>
-          <Scena />
+          <Scena attivo={scenaAttiva} />
         </Suspense>
       </ScenaProtetta>
     </div>

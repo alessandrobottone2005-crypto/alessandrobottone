@@ -1,0 +1,165 @@
+{
+  "checks": {
+    "render_1920_1080_24fps": true,
+    "camera_ampia_attiva": true,
+    "tutte_le_immagini_incorporate": true,
+    "atlante_incorporato": true,
+    "guida_interna": true,
+    "camere": true,
+    "logo_nove_mesh": true,
+    "shape_keys": true,
+    "azioni_riutilizzabili": true,
+    "luce_logo_esclusiva": true,
+    "sole_esclude_logo": true,
+    "postazione_appoggiata": true,
+    "altezza_originale_3_1": true,
+    "schermo_quattro_angoli": true,
+    "schermo_uv_corrette": true,
+    "stato_frame_1": true,
+    "atlante_frame_1": true,
+    "stato_frame_24": true,
+    "atlante_frame_24": true,
+    "stato_frame_75": true,
+    "atlante_frame_75": true,
+    "stato_frame_134": true,
+    "atlante_frame_134": true,
+    "stato_frame_168": true,
+    "atlante_frame_168": true,
+    "stato_frame_216": true,
+    "atlante_frame_216": true,
+    "stato_frame_264": true,
+    "atlante_frame_264": true,
+    "stato_frame_312": true,
+    "atlante_frame_312": true,
+    "stato_frame_348": true,
+    "atlante_frame_348": true,
+    "stato_frame_384": true,
+    "atlante_frame_384": true,
+    "stato_frame_432": true,
+    "atlante_frame_432": true,
+    "battito_chiude_entrambi": true,
+    "occhiolino_un_occhio": true,
+    "sorriso_anima_bocca": true,
+    "sonno_chiude_entrambi": true,
+    "risveglio_riapre": true,
+    "driver_validi_senza_autorun": true
+  },
+  "passed": true,
+  "invalid_drivers": [],
+  "images": 25,
+  "height": 3.100000195596742,
+  "floor": -5.2545594542152685e-08,
+  "screen_samples": [
+    {
+      "frame": 1,
+      "stato": 0,
+      "tessera": 0.0,
+      "avvio": 0
+    },
+    {
+      "frame": 24,
+      "stato": 1,
+      "tessera": 1.0,
+      "avvio": 0
+    },
+    {
+      "frame": 75,
+      "stato": 1,
+      "tessera": 52.0,
+      "avvio": 51
+    },
+    {
+      "frame": 134,
+      "stato": 3,
+      "tessera": 111.0,
+      "avvio": 109
+    },
+    {
+      "frame": 168,
+      "stato": 4,
+      "tessera": 112.0,
+      "avvio": 109
+    },
+    {
+      "frame": 216,
+      "stato": 5,
+      "tessera": 113.0,
+      "avvio": 109
+    },
+    {
+      "frame": 264,
+      "stato": 6,
+      "tessera": 114.0,
+      "avvio": 109
+    },
+    {
+      "frame": 312,
+      "stato": 7,
+      "tessera": 115.0,
+      "avvio": 109
+    },
+    {
+      "frame": 348,
+      "stato": 8,
+      "tessera": 116.0,
+      "avvio": 109
+    },
+    {
+      "frame": 384,
+      "stato": 9,
+      "tessera": 117.0,
+      "avvio": 109
+    },
+    {
+      "frame": 432,
+      "stato": 3,
+      "tessera": 111.0,
+      "avvio": 109
+    }
+  ],
+  "expressions": [
+    {
+      "frame": 1,
+      "sx": 0.0,
+      "dx": 0.0,
+      "sorriso": 0.0
+    },
+    {
+      "frame": 77,
+      "sx": 1.0,
+      "dx": 1.0,
+      "sorriso": 0.0
+    },
+    {
+      "frame": 114,
+      "sx": 0.0,
+      "dx": 1.0,
+      "sorriso": 0.0
+    },
+    {
+      "frame": 160,
+      "sx": 0.1599999964237213,
+      "dx": 0.1599999964237213,
+      "sorriso": 1.0
+    },
+    {
+      "frame": 243,
+      "sx": 1.0,
+      "dx": 1.0,
+      "sorriso": 0.0
+    },
+    {
+      "frame": 291,
+      "sx": 0.0,
+      "dx": 0.0,
+      "sorriso": 0.0
+    },
+    {
+      "frame": 342,
+      "sx": 1.0,
+      "dx": 1.0,
+      "sorriso": 0.0
+    }
+  ],
+  "reopened_from": "/Volumes/SSD_ALE/Portfolio2026/Projects/alessandrobottone/sorgenti/landing/Landing_Completa.blend"
+}

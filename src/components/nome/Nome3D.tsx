@@ -8,6 +8,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import type { Font } from 'three/examples/jsm/loaders/FontLoader.js'
 import { caricaLogo } from '@/components/volto/modelloLogo'
 import { sguardo } from '@/components/volto/sguardo'
+import { attivitaScena } from '@/lib/attivitaScena'
 import { gsap } from '@/lib/gsap'
 import { media } from '@/config/movimento'
 import { caricaFontNome } from './fontNome'
@@ -27,12 +28,12 @@ const ALTEZZA_X = 0.36
 
 type Misura = { x: number; base: number; taglio: number; em: number; ok: boolean }
 
-export default function Nome3D({ radice }: { radice: RefObject<HTMLElement | null> }) {
+export default function Nome3D({ radice, attivo }: { radice: RefObject<HTMLElement | null>; attivo: boolean }) {
   const font = use(caricaFontNome())
   const { modello } = use(caricaLogo())
   return (
     <Canvas
-      frameloop="demand"
+      frameloop={attivo ? 'demand' : 'never'}
       dpr={qualita.valori.dpr}
       camera={{ fov: CAMPO, position: [0, 0, DISTANZA], near: 0.1, far: 200 }}
       gl={{ antialias: true, alpha: true, toneMapping: THREE.AgXToneMapping }}
@@ -169,7 +170,7 @@ function Lettere({ radice, font, modello }: { radice: RefObject<HTMLElement | nu
     if (radice.current) resize.observe(radice.current)
     document.fonts.ready.then(ridimensiona)
     const tick = () => {
-      if (document.hidden) return
+      if (document.hidden || !attivitaScena.attiva) return
       const ora = performance.now()
       if (ora > finoA && !gsap.isTweening(elementi)) {
         if ((sporco || inMovimento.current) && richiedi()) sporco = false

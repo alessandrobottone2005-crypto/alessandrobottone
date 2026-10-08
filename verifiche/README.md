@@ -27,3 +27,11 @@ npm run diagnostica-luce -- http://127.0.0.1:4173/
 I primi due comandi e la diagnostica accettano anche una cartella di destinazione come argomento dopo l’URL. Per i controlli online sostituire l’URL con il dominio pubblico e scegliere una cartella distinta, per esempio `verifiche/risultati/produzione/computer`.
 
 L’emulazione mobile conserva la GPU del Mac e non equivale a misure su telefono fisico. I risultati delle pubblicazioni sono in [pubblicazione](../docs/pubblicazione.md).
+
+## archivio a tutta vista (7 ottobre 2026)
+
+`node scripts/verifiche/verifica-archivio.mjs http://127.0.0.1:4173/` verifica apertura, filtri, tutti i nove lavori, PDF, ingrandimenti, cronologia, focus, ritorno al computer e fallback. Risultati in `verifiche/risultati/archivio/`. `CASO=telefono` limita la prova a un dispositivo.
+
+## Accesso rapido (8 ottobre 2026)
+
+`node scripts/verifiche/verifica-accesso-rapido.mjs` verifica ingresso leggero, cronologia, ritorni e sospensione dei canvas. Rapporti in `risultati/accesso-rapido/`; confronto dei trasferimenti a cache fredda in `confronto.json`. Le dimensioni mobili sono emulate in Chrome. Vedi [flusso e limiti](../docs/accesso-rapido.md).
